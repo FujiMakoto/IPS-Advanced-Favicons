@@ -1,1 +1,10 @@
-[]
+{
+    "favicons": {
+        "settings": {
+            "tab": "customization",
+            "controller": "settings",
+            "do": "",
+            "restriction": "settings_manage"
+        }
+    }
+}

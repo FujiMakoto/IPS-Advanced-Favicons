@@ -1,1 +1,8 @@
-[]
+{
+    "admin": {
+        "favicons": {
+            "default_controller": "",
+            "protected": false
+        }
+    }
+}
