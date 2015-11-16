@@ -5,6 +5,12 @@
             "controller": "settings",
             "do": "",
             "restriction": "settings_manage"
+        },
+        "manage": {
+            "tab": "customization",
+            "controller": "manage",
+            "do": "",
+            "restriction": "manage_manage"
         }
     }
 }

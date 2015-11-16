@@ -14,9 +14,11 @@ $lang = array(
 	'favicons_androidTab'       => 'Android',
 	'favicons_androidHeader'    => 'Android Chrome',
 
-	'favicons_androidAppName'       => 'App name',
-	'favicons_androidColor'         => 'Theme color',
-	'favicons_androidColor_desc'    => 'Starting with Android Lollipop, you can customize the color of the task bar in the switcher.',
+	'favicons_androidAppName'           => 'App name',
+	'favicons_androidAppShortName'      => 'App short name',
+	'favicons_androidAppShortName_desc' => 'Optional. The short name is preferred over name and if provided will be used.',
+	'favicons_androidColor'             => 'Theme color',
+	'favicons_androidColor_desc'        => 'Starting with Android Lollipop, you can customize the color of the task bar in the switcher.',
 
 	'favicons_androidStandalone'        => 'Enable standalone mode?',
 	'favicons_androidStandalone_desc'   => 'In this mode, Android Chrome gives a little more "native" style to the opened page.<br>
@@ -53,4 +55,34 @@ In particular, it lets you enforce the start URL and screen orientation. It also
 	'favicons_msTileColor_green'        => 'Green',
 
 	'favicons_msTileColor_custom'       => 'Custom color',
+
+	/**
+	 * [Admin] Manage
+	 */
+	'favicons_wizard_title' => 'Favicon Generation Wizard',
+	'favicons_wizard_run'   => 'Run Wizard',
+
+	# Step 1 - Master
+	'favicons_master'       => 'Master Image',
+	'favicons_master_hDesc' => 'This is the base image that will be used to generate all of your sites favicons.<br>
+For best results, this image should be at least 192 x 192px in size.',
+
+	# Step 2 - Android
+	'favicons_android'          => 'Android',
+	'favicons_android_hDesc'    => 'Android users can mix their natives apps and web bookmarks on the homescreen. Bookmark links looks like just like native apps.',
+
+	# Step 3 - iOS
+	'favicons_ios'      => 'iOS',
+
+	# Step 4 - Android
+	'favicons_safari'   => 'Safari',
+
+	# Step 5 - Windows
+	'favicons_windows'  => 'Windows',
+
+	# Filters
+	'favicons_filter_android'   => 'Android',
+	'favicons_filter_ios'       => 'iOS',
+	'favicons_filter_safari'    => 'Safari',
+	'favicons_filter_windows'   => 'Windows',
 );

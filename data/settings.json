@@ -1,1 +1,34 @@
-[]
+[
+    {
+        "key": "favicons_androidAppName",
+        "default": ""
+    },
+    {
+        "key": "favicons_androidAppShortName",
+        "default": ""
+    },
+    {
+        "key": "favicons_androidColor",
+        "default": "FFFFFF"
+    },
+    {
+        "key": "favicons_androidStandalone",
+        "default": "0"
+    },
+    {
+        "key": "favicons_msTileColor",
+        "default": "#2d89ef"
+    },
+    {
+        "key": "favicons_msTileColor_custom",
+        "default": ""
+    },
+    {
+        "key": "settings_favicons_androidStandalone_orientation",
+        "default": ""
+    },
+    {
+        "key": "settings_favicons_androidStandalone_startUrl",
+        "default": ""
+    }
+]
