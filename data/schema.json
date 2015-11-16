@@ -1,1 +1,105 @@
-[]
+{
+    "favicons_favicons": {
+        "name": "favicons_favicons",
+        "columns": {
+            "id": {
+                "allow_null": false,
+                "auto_increment": true,
+                "binary": false,
+                "comment": "ID Number",
+                "decimals": null,
+                "default": null,
+                "length": 20,
+                "name": "id",
+                "type": "BIGINT",
+                "unsigned": true,
+                "values": [],
+                "zerofill": false
+            },
+            "type": {
+                "allow_null": true,
+                "auto_increment": false,
+                "binary": false,
+                "comment": "1 = Android, 2 = iOS, 3 = Safari, 4 = Win 8\/10",
+                "decimals": null,
+                "default": null,
+                "length": 1,
+                "name": "type",
+                "type": "TINYINT",
+                "unsigned": true,
+                "values": [],
+                "zerofill": false
+            },
+            "file": {
+                "allow_null": true,
+                "auto_increment": false,
+                "binary": false,
+                "comment": "Image filename \/ IPS filepath",
+                "decimals": null,
+                "default": null,
+                "length": 0,
+                "name": "file",
+                "type": "TEXT",
+                "unsigned": false,
+                "values": [],
+                "zerofill": false
+            },
+            "name": {
+                "allow_null": false,
+                "auto_increment": false,
+                "binary": false,
+                "comment": "User friendly filename",
+                "decimals": null,
+                "default": "",
+                "length": 255,
+                "name": "name",
+                "type": "VARCHAR",
+                "unsigned": false,
+                "values": [],
+                "zerofill": false
+            },
+            "width": {
+                "allow_null": true,
+                "auto_increment": false,
+                "binary": false,
+                "comment": "Favicon width",
+                "decimals": null,
+                "default": null,
+                "length": 5,
+                "name": "width",
+                "type": "SMALLINT",
+                "unsigned": true,
+                "values": [],
+                "zerofill": false
+            },
+            "height": {
+                "name": "height",
+                "type": "SMALLINT",
+                "length": 5,
+                "decimals": null,
+                "values": [],
+                "allow_null": true,
+                "default": null,
+                "comment": "Favicon height",
+                "unsigned": true,
+                "zerofill": false,
+                "auto_increment": false,
+                "binary": false
+            }
+        },
+        "indexes": {
+            "PRIMARY": {
+                "type": "primary",
+                "name": "PRIMARY",
+                "length": [
+                    null
+                ],
+                "columns": [
+                    "id"
+                ]
+            }
+        },
+        "collation": "utf8mb4_unicode_ci",
+        "engine": "InnoDB"
+    }
+}
