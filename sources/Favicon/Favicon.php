@@ -34,6 +34,25 @@ class _Favicon extends \IPS\Patterns\ActiveRecord
 	public static $androidNameTemplate = 'android-chrome-%d-%d.%s';
 
 	/**
+	 * @brief   Apple favicon sizes
+	 */
+	public static $appleSizes = [
+		['57', '57'],
+		['60', '60'],
+		['72', '72'],
+		['76', '76'],
+		['120', '120'],
+		['144', '144'],
+		['152', '152'],
+		['180', '180'],
+	];
+
+	/**
+	 * @brief   Apple filename template
+	 */
+	public static $appleNameTemplate = 'apple-touch-icon-%d-%d.%s';
+
+	/**
 	 * @brief   Database Table
 	 */
 	public static $databaseTable = 'favicons_favicons';
@@ -145,11 +164,36 @@ class _Favicon extends \IPS\Patterns\ActiveRecord
 		}
 	}
 
-	public static function generateForAndroid()
+	public static function generateIcons( $for=self::MASTER )
 	{
-		$master = static::master();
+		switch ( $for )
+		{
+			case static::MASTER:
+				$type = 'master';
+				break;
+
+			case static::ANDROID:
+				$type = 'android';
+				break;
+
+			case static::SAFARI:
+			case static::IOS:
+				$type = 'apple';
+				break;
+
+			case static::WINDOWS:
+				$type = 'windows';
+				break;
+
+			default:
+				throw new \UnexpectedValueException( 'Unrecognized icon type' );
+		}
+
+		$sizes = "{$type}Sizes";
+		$nameTemplate = "{$type}NameTemplate";
 
 		/* Can we support our master images filetype? */
+		$master = static::master();
 		switch ( File::getMimeType( (string) $master ) )
 		{
 			case 'image/x-icon':
@@ -166,28 +210,47 @@ class _Favicon extends \IPS\Patterns\ActiveRecord
 		}
 
 		/* Generate the favicons */
-		foreach ( static::$androidSizes as $size )
+		foreach ( static::$$sizes as $size )
 		{
 			list( $width, $height ) = $size;
 
 			$favicon = \IPS\Image::create( $master->contents() );
 			$favicon->resize( $width, $height );
-			$filename = sprintf( static::$androidNameTemplate, $width, $height, $ext );
+			$filename = sprintf( static::$$nameTemplate, $width, $height, $ext );
 
 			$file = File::create( 'favicons_Favicons', $filename, (string) $favicon, 'favicons', FALSE, NULL, FALSE );
 
 			/* Save the new favicon record */
 			$record = new Favicon();
 
-			$record->type = Favicon::ANDROID;
+			$record->type = $for;
 			$record->name = $file->filename;
 			$record->file = $file;
 
 			$record->save();
 		}
 
-		/* Create the manifest.json file */
-		File::create( 'favicons_Favicons', 'manifest.json', static::androidManifest(), 'favicons', FALSE, NULL, FALSE );
+		/* Apple specific patch-in */
+		if ( $for === static::IOS )
+		{
+			$favicon = \IPS\Image::create( $master->contents() );
+			$favicon->resize( 180, 180 );
+
+			foreach ( ['apple-touch-icon.%s', 'apple-touch-icon-precomposed.%s'] as $filenameTemplate )
+			{
+				$filename = sprintf( $filenameTemplate, $ext );
+				$file = File::create( 'favicons_Favicons', $filename, (string) $favicon, 'favicons', FALSE, NULL, FALSE );
+
+				/* Save the new favicon record */
+				$record = new Favicon();
+
+				$record->type = Favicon::ANDROID;
+				$record->name = $file->filename;
+				$record->file = $file;
+
+				$record->save();
+			}
+		}
 	}
 
 	/**

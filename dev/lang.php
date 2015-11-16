@@ -35,7 +35,7 @@ In particular, it lets you enforce the start URL and screen orientation. It also
 
 	# iOS
 	'favicons_iosTab'       => 'iOS',
-	'favicons_iosHeader'    => 'Android Chrome',
+	'favicons_iosHeader'    => 'iOS - Web Clip',
 
 	# Microsoft
 	'favicons_msTab'    => 'Microsoft',
@@ -72,13 +72,32 @@ For best results, this image should be at least 192 x 192px in size.',
 	'favicons_android_hDesc'    => 'Android users can mix their natives apps and web bookmarks on the homescreen. Bookmark links looks like just like native apps.',
 
 	# Step 3 - iOS
-	'favicons_ios'      => 'iOS',
+	'favicons_ios'              => 'iOS',
+	'favicons_iosHeader'        => 'iOS - Web Clip',
+	'favicons_ios_hDesc'        => 'iOS can automatically add some visual effects to your icon so that it coordinates with the built-in icons on the Home screen (as it does with application icons).',
+	'favicons_iosFancy'         => 'Enable fancy effects?',
+	'favicons_iosFancy_desc'    => 'When enabled, the following special effects will be automatically applied to your icon on iOS devices:<br>
+<ul>
+	<li>Rounded corners</li>
+	<li>Drop shadow</li>
+	<li>Reflective shine</li>
+</ul>',
 
-	# Step 4 - Android
-	'favicons_safari'   => 'Safari',
+	# Step 4 - Safari
+	'favicons_safari'           => 'Safari',
+	'favicons_safariHeader'     => 'Safari Pinned Tab',
+	'favicons_safari_hDesc'     => 'Safari 9 for Mac OS X El Capitan implements pinned tabs. This feature relies on an SVG icon. This icon must be monochrome and Safari does the rest.<br>
+This is optional and can be skipped if you do not have a SVG image to use. Safari uses the first letter of your domain name to create a default icon in this case.',
+	'favicons_safariSvg'        => 'Safari SVG image',
+	// 'favicons_safariSvg_desc'   => 'If you do not have an SVG image to use, skip this upload.',
 
 	# Step 5 - Windows
-	'favicons_windows'  => 'Windows',
+	'favicons_windows'          => 'Windows',
+	'favicons_windowsHeader'    => 'Windows 8 and 10',
+	'favicons_windows_hDesc'    => 'Windows 8 users can pin your website on their desktop. Your site appears as a tile, just like a native Windows 8 app.',
+
+	# Step 6 - Review
+	'favicons_review'   => 'Complete',
 
 	# Filters
 	'favicons_filter_android'   => 'Android',

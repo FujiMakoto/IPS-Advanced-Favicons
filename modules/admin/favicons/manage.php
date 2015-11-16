@@ -98,7 +98,8 @@ class _manage extends \IPS\Dispatcher\Controller
 				'favicons_android'  => array( $this, '_stepAndroid' ),
 				'favicons_ios'      => array( $this, '_stepIOS' ),
 				'favicons_safari'   => array( $this, '_stepSafari' ),
-				'favicons_windows'  => array( $this, '_stepWindows' )
+				'favicons_windows'  => array( $this, '_stepWindows' ),
+				'favicons_review'   => array( $this, '_stepRview' ),
 		), \IPS\Http\Url::internal( 'app=favicons&module=favicons&controller=manage&do=wizard' ), TRUE, $initialData );
 
 		/**
@@ -176,10 +177,10 @@ class _manage extends \IPS\Dispatcher\Controller
 		$s = \IPS\Settings::i();
 		$form->add( new Form\Text( 'favicons_androidAppName', $s->board_name, TRUE ) );
 		// $form->add( new Form\Text( 'favicons_androidAppShortName', NULL, FALSE ) );  // Keeping the wizard simple
-		$form->add( new Form\Color( 'favicons_androidColor', 'FFFFFF' ) );
+		$form->add( new Form\Color( 'favicons_androidColor', '3C6994' ) );
 
 		# Browser mode
-		$form->add( new Form\YesNo( 'favicons_androidStandalone', $s->favicons_androidStandalone, FALSE,
+		$form->add( new Form\YesNo( 'favicons_androidStandalone', NULL, FALSE,
 				[
 						'togglesOn' => [
 								'android_favicons_androidStandalone_startUrl',
@@ -187,8 +188,8 @@ class _manage extends \IPS\Dispatcher\Controller
 						]
 				]
 		) );
-		$form->add( new Form\Url( 'favicons_androidStandalone_startUrl', $s->favicons_androidStandalone_startUrl ) );
-		$form->add( new Form\Select( 'favicons_androidStandalone_orientation', $s->favicons_androidStandalone_orientation, FALSE,
+		$form->add( new Form\Url( 'favicons_androidStandalone_startUrl', NULL ) );
+		$form->add( new Form\Select( 'favicons_androidStandalone_orientation', 'default', FALSE,
 				[
 						'options' => [
 								'default'   => 'favicons_androidStandalone_orientation_default',
@@ -203,7 +204,10 @@ class _manage extends \IPS\Dispatcher\Controller
 			if ( !isset( \IPS\Request::i()->ajaxValidate ) )
 			{
 				$form->saveAsSettings( $values );
-				Favicon::generateForAndroid();
+				Favicon::generateIcons( Favicon::ANDROID );
+
+				/* Create the manifest.json file */
+				\IPS\File::create( 'favicons_Favicons', 'manifest.json', Favicon::androidManifest(), 'favicons', FALSE, NULL, FALSE );
 			}
 
 			return $values;
@@ -220,11 +224,66 @@ class _manage extends \IPS\Dispatcher\Controller
 	 */
 	public function _stepIOS( $data )
 	{
-		$form = new Form( 'ios', 'continue' );
-		$form->ajaxOutput = TRUE;
+		$form = new Form( 'ios', 'continue', \IPS\Http\Url::internal( 'app=favicons&module=favicons&controller=manage&do=wizard&_step=favicons_ios' ) );
+		//$form->ajaxOutput = TRUE;
 		$form->class = 'ipsForm_vertical';
 
-		$form->add( new Form\Text( 'foo' ) );
+		$form->add( new Form\YesNo( 'favicons_iosFancy', TRUE ) );
+
+		if ( $values = $form->values() )
+		{
+			if ( !isset( \IPS\Request::i()->ajaxValidate ) )
+			{
+				Favicon::generateIcons( Favicon::IOS );
+			}
+
+			return $values;
+		}
+
+		return \IPS\Theme::i()->getTemplate( 'wizard' )->step3( $form );
+	}
+
+	/**
+	 * Wizard step: iOS images
+	 *
+	 * @param	array	$data	The current wizard data
+	 * @return	string|array
+	 */
+	public function _stepSafari( $data )
+	{
+		$form = new Form( 'safari', 'continue', \IPS\Http\Url::internal( 'app=favicons&module=favicons&controller=manage&do=wizard&_step=favicons_safari' ) );
+		//$form->ajaxOutput = TRUE;
+		$form->class = 'ipsForm_vertical';
+
+		$form->add( new Form\Upload( 'favicons_safariSvg', NULL, FALSE,
+				[
+						'storageExtension' => 'favicons_Favicons',
+						'allowedFileTypes' => ['svg']
+				]
+		) );
+
+		if ( $values = $form->values() )
+		{
+			if ( !isset( \IPS\Request::i()->ajaxValidate ) )
+			{
+				if ( $values['favicons_safariSvg'] )
+				{
+					$contents = $values['favicons_safariSvg']->contents();
+					$values['favicons_safariSvg']->delete();
+					$file = \IPS\File::create( 'favicons_Favicons', 'safari-pinned-tab.svg', $contents, 'favicons',
+							FALSE, NULL, FALSE
+					);
+
+					$favicon = new Favicon();
+					$favicon->type = Favicon::SAFARI;
+					$favicon->name = $file->filename;
+					$favicon->file = $file;
+					$favicon->save();
+				}
+			}
+
+			return $values;
+		}
 
 		return \IPS\Theme::i()->getTemplate( 'wizard' )->step3( $form );
 	}
@@ -235,29 +294,33 @@ class _manage extends \IPS\Dispatcher\Controller
 	 * @param	array	$data	The current wizard data
 	 * @return	string|array
 	 */
-	public function _stepSafari( $data )
-	{
-		$form = new Form( 'android', 'continue' );
-		$form->class = 'ipsForm_vertical';
-
-		$form->add( new Form\Text( 'foo' ) );
-
-		return \IPS\Theme::i()->getTemplate( 'wizard' )->step4( $form );
-	}
-
-	/**
-	 * Wizard step: Safari images
-	 *
-	 * @param	array	$data	The current wizard data
-	 * @return	string|array
-	 */
 	public function _stepWindows( $data )
 	{
-		$form = new Form( 'android', 'continue' );
+		$form = new Form( 'windows', 'continue', \IPS\Http\Url::internal( 'app=favicons&module=favicons&controller=manage&do=wizard&_step=favicons_windows' ) );
 		$form->class = 'ipsForm_vertical';
 
-		$form->add( new Form\Text( 'foo' ) );
+		# Tile color
+		$form->add( new Form\Select( 'favicons_msTileColor', '#2d89ef', FALSE,
+				[
+						'options' => [
+								'#2d89ef'   => 'favicons_msTileColor_blue',
+								'#2b5797'   => 'favicons_msTileColor_darkBlue',
+								'#00aba9'   => 'favicons_msTileColor_teal',
+								'#9f00a7'   => 'favicons_msTileColor_lightPurple',
+								'#603cba'   => 'favicons_msTileColor_darkPurple',
+								'#b91d47'   => 'favicons_msTileColor_darkRed',
+								'#da532c'   => 'favicons_msTileColor_darkOrange',
+								'#ffc40d'   => 'favicons_msTileColor_yellow',
+								'#00a300'   => 'favicons_msTileColor_green'
+						],
+					// We don't use userSuppliedInput here because we want to be able to display a Color form, not Text
+						'unlimited'         => 'custom',
+						'unlimitedLang'     => 'favicons_msTileColor_custom',
+						'unlimitedToggles'  => ['windows_favicons_msTileColor_custom']
+				]
+		) );
+		$form->add( new Form\Color( 'favicons_msTileColor_custom' ) );
 
-		return \IPS\Theme::i()->getTemplate( 'wizard' )->step5( $form );
+		return \IPS\Theme::i()->getTemplate( 'wizard' )->step4( $form );
 	}
 }

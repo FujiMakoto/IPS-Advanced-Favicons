@@ -44,7 +44,8 @@ class _settings extends \IPS\Dispatcher\Controller
 		$form->addTab( 'favicons_androidTab' );
 		$form->addHeader( 'favicons_androidHeader' );
 
-		$form->add( new Form\Text( 'favicons_androidAppName', $s->favicons_androidAppName ) );
+		$form->add( new Form\Text( 'favicons_androidAppName', $s->favicons_androidAppName, TRUE ) );
+		$form->add( new Form\Text( 'favicons_androidAppShortName', NULL, FALSE ) );
 		$form->add( new Form\Color( 'favicons_androidColor', $s->favicons_androidColor ) );
 
 		# Browser mode
