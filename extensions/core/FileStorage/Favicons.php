@@ -51,7 +51,14 @@ class _Favicons
 
 		foreach ( $favicons as $favicon )
 		{
-			\IPS\File::get( $oldConfiguration ?: 'favicons_Favicons', $favicon['file'] )->move( $storageConfiguration );
+			if ( $oldConfiguration )
+			{
+				\IPS\File::get( $oldConfiguration ?: 'favicons_Favicons', (string) $favicon->file )->move( $storageConfiguration );
+			}
+			else
+			{
+				$favicon->file->move( $storageConfiguration );
+			}
 		}
 	}
 
@@ -86,8 +93,7 @@ class _Favicons
 
 		foreach ( $favicons as $favicon )
 		{
-			\IPS\File::get( 'favicons_Favicons', $favicon['file'] )->delete();
-			Favicon::constructFromData( $favicon )->delete();
+			$favicon->delete();
 		}
 	}
 }
