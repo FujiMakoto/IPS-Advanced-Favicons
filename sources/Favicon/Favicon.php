@@ -5,6 +5,7 @@ namespace IPS\favicons;
 
 use IPS\Db;
 use IPS\File;
+use IPS\Settings;
 
 class _Favicon extends \IPS\Patterns\ActiveRecord
 {
@@ -31,7 +32,12 @@ class _Favicon extends \IPS\Patterns\ActiveRecord
 	 * @brief   Standard filename template
 	 */
 	public static $masterNameTemplate = 'favicon-%d-%d.%s';
-	
+
+	/**
+	 * @brief   Standard HTML template
+	 */
+	public static $masterHtmlTemplate = '<link rel="icon" type="%3$s" href="%1$s" sizes="%2$s">';
+
 	/**
 	 * @brief   Android favicon sizes
 	 */
@@ -48,6 +54,11 @@ class _Favicon extends \IPS\Patterns\ActiveRecord
 	 * @brief   Android filename template
 	 */
 	public static $androidNameTemplate = 'android-chrome-%d-%d.%s';
+
+	/**
+	 * @brief   Android HTML template
+	 */
+	public static $androidHtmlTemplate = '<link rel="icon" type="%3$s" href="%1$s" sizes="%2$s">';
 
 	/**
 	 * @brief   Apple favicon sizes
@@ -69,6 +80,11 @@ class _Favicon extends \IPS\Patterns\ActiveRecord
 	public static $appleNameTemplate = 'apple-touch-icon-%d-%d.%s';
 
 	/**
+	 * @brief   Apple HTML template
+	 */
+	public static $appleHtmlTemplate = '<link rel="apple-touch-icon" sizes="%2$s" href="%1$s">';
+
+	/**
 	 * @brief   Apple favicon sizes
 	 */
 	public static $windowsSizes = [
@@ -80,6 +96,11 @@ class _Favicon extends \IPS\Patterns\ActiveRecord
 	 * @brief   Apple filename template
 	 */
 	public static $windowsNameTemplate = 'mstile-%d-%d.%s';
+
+	/**
+	 * @brief   Standard HTML template
+	 */
+	public static $windowsHtmlTemplate = '<meta name="msapplication-TileImage" content="%1$s">';
 
 	/**
 	 * @brief   Database Table
@@ -113,7 +134,7 @@ class _Favicon extends \IPS\Patterns\ActiveRecord
 	 */
 	protected function get_file()
 	{
-		return $this->_file ?: $this->_file = \IPS\File::get( 'favicons_Favicons', $this->_data['file'] );
+		return $this->_file ?: $this->_file = File::get( 'favicons_Favicons', $this->_data['file'] );
 	}
 
 	/**
@@ -122,7 +143,7 @@ class _Favicon extends \IPS\Patterns\ActiveRecord
 	 * @param   \IPS\File   $file
 	 * @return  void
 	 */
-	protected function set_file( \IPS\File $file )
+	protected function set_file( File $file )
 	{
 		$this->_data['file'] = (string) $file;
 		$this->_file = NULL;
@@ -146,6 +167,86 @@ class _Favicon extends \IPS\Patterns\ActiveRecord
 		return "{$this->width}x{$this->height}";
 	}
 
+	protected function get_html()
+	{
+		$type = NULL;
+
+		/* Template overrides */
+		if ( $this->type === static::MASTER )
+		{
+			$type = 'master';
+
+			if ( $this->file->filename == 'favicon.ico' )
+				return '<link rel="shortcut icon" href="' . htmlspecialchars( (string) $this->file->url ) . '">';
+		}
+
+		if ( $this->type === static::ANDROID )
+		{
+			$type = 'android';
+
+			if ( ( $this->width != 192 ) and ( $this->height != 192 ) )
+				return NULL;
+		}
+
+		if ( $this->type === static::WINDOWS )
+		{
+			$type = 'windows';
+
+			if ( ( $this->width != 144 ) and ( $this->height != 144 ) )
+				return NULL;
+		}
+
+		if ( $this->type === static::SAFARI )
+			return '<link rel="mask-icon" href="' . htmlspecialchars( (string) $this->file->url ) . '" color="#5bbad5">';
+
+		if ( $this->type === static::IOS )
+			$type = 'apple';
+
+		/* Format the HTML output and return */
+		if ( $type )
+		{
+			$htmlTemplate = "{$type}HtmlTemplate";
+			$url = htmlspecialchars( (string) $this->file->url );
+			return sprintf( static::$$htmlTemplate, $url, $this->sizes, File::getMimeType( (string) $this->file ) );
+		}
+	}
+
+	public static function html( $ignoreCache=FALSE )
+	{
+		if ( !$ignoreCache and isset( \IPS\Data\Store::i()->favicons_html ) )
+		{
+			return \IPS\Data\Store::i()->favicons_html;
+		}
+
+		$html = '';
+
+		$favicons = static::favicons();
+		foreach( $favicons as $favicon )
+		{
+			if ( $result = $favicon->html )
+			{
+				$html = $html . $result;
+			}
+		}
+
+		/* Android extra data */
+		if ( $manifest = static::androidManifestHtml() )
+		{
+			$html = $html . $manifest;
+		}
+
+		/* Microsoft extra data */
+		if ( $browserConfig = static::microsoftBrowserConfigHtml() )
+		{
+			$html = $html . $browserConfig;
+		}
+
+		if ( !$ignoreCache )
+			\IPS\Data\Store::i()->favicons_html = $html;
+
+		return $html;
+	}
+
 	/**
 	 * @param   int|null    $type   Optional favicon type to filter by.
 	 * @return  \IPS\Db\Select
@@ -166,13 +267,14 @@ class _Favicon extends \IPS\Patterns\ActiveRecord
 
 	/**
 	 * Get the master image
+
 	 *
-	 * @return  \IPS\File
+*@return  File
 	 */
 	public static function baseImage()
 	{
 		$file = Db::i()->select( 'file', static::$databaseTable, [ 'type=?', static::BASE ], 'id DESC' )->first();
-		return \IPS\File::get( 'favicons_Favicons', $file );
+		return File::get( 'favicons_Favicons', $file );
 	}
 
 	/**
@@ -195,6 +297,14 @@ class _Favicon extends \IPS\Patterns\ActiveRecord
 		{
 			$favicon->delete();
 		}
+
+		/* Reset the application setup status */
+		Settings::i()->favicons_setUpComplete = 0;
+		Db::i()->update( 'core_sys_conf_settings', array( 'conf_value' => 0 ), array( 'conf_key=?', 'favicons_setUpComplete' ) );
+		unset( \IPS\Data\Store::i()->settings );
+
+		/* Clear any cached HTML output for favicons */
+		unset( \IPS\Data\Store::i()->favicons_html );
 	}
 
 	public static function generateIcons( $for=self::MASTER )
@@ -316,7 +426,7 @@ class _Favicon extends \IPS\Patterns\ActiveRecord
 	 */
 	public static function androidManifest( $json=TRUE )
 	{
-		$s = \IPS\Settings::i();
+		$s = Settings::i();
 
 		$manifest = [
 				'name'  => $s->favicons_androidAppName,
@@ -355,6 +465,32 @@ class _Favicon extends \IPS\Patterns\ActiveRecord
 		return $json ? json_encode( $manifest ) : $manifest;
 	}
 
+	public static function androidManifestHtml()
+	{
+		$s = Settings::i();
+
+		if ( $url = $s->favicons_androidManifest )
+		{
+			try
+			{
+				$file = File::get( 'favicons_Favicons', $url );
+				$url = (string) $file->url;
+				$html = "<link rel='manifest' href='{$url}'>";
+
+				if ( $themeColor = $s->favicons_androidColor )
+				{
+					$html = $html . "<meta name='theme-color' content='{$themeColor}'>";
+				}
+
+				return $html;
+			}
+			catch ( \Exception $e )
+			{
+				\IPS\Log::i( \LOG_DEBUG )->write( 'Favicons Error : ' . $e->getMessage() . "\n" . $e->getTraceAsString(), 'favicons_error' );
+			}
+		}
+	}
+
 	/**
 	 * Generate Microsoft browserconfig.xml data
 	 *
@@ -362,7 +498,7 @@ class _Favicon extends \IPS\Patterns\ActiveRecord
 	 */
 	public static function microsoftBrowserConfig()
 	{
-		$s = \IPS\Settings::i();
+		$s = Settings::i();
 
 		$xml = new \SimpleXMLElement( '<xml/>' );
 		$browserConfig = $xml->addChild( 'browserconfig' );
@@ -378,6 +514,35 @@ class _Favicon extends \IPS\Patterns\ActiveRecord
 
 		$tile->addChild( 'TileColor', $s->favicons_msTileColor );
 		return $xml->asXML();
+	}
+
+	public static function microsoftBrowserConfigHtml()
+	{
+		$s = Settings::i();
+
+		if ( $url = $s->favicons_microsoftBrowserConfig )
+		{
+			try
+			{
+				$file = File::get( 'favicons_Favicons', $url );
+				$url = (string) $file->url;
+				$html = "<meta name='msapplication-config' content='{$url}'>";
+
+				if ( $tileColor = $s->favicons_msTileColor )
+				{
+					if ( $tileColor == 'custom' )
+						$tileColor = $s->favicons_msTileColor_custom ?: '#ffffff';
+
+					$html = $html . "<meta name='msapplication-TileColor' content='{$tileColor}'>";
+				}
+
+				return $html;
+			}
+			catch ( \Exception $e )
+			{
+				\IPS\Log::i( \LOG_DEBUG )->write( 'Favicons Error : ' . $e->getMessage() . "\n" . $e->getTraceAsString(), 'favicons_error' );
+			}
+		}
 	}
 
 	/**

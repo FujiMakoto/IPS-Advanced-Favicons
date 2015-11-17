@@ -209,7 +209,12 @@ class _manage extends \IPS\Dispatcher\Controller
 				Favicon::generateIcons( Favicon::ANDROID );
 
 				/* Create the manifest.json file */
-				\IPS\File::create( 'favicons_Favicons', 'manifest.json', Favicon::androidManifest(), 'favicons', FALSE, NULL, FALSE );
+				$manifest = \IPS\File::create( 'favicons_Favicons', 'manifest.json', Favicon::androidManifest(), 'favicons', FALSE, NULL, FALSE );
+
+				/* Store the manifest filename in settings */
+				$s->favicons_androidManifest = (string) $manifest;
+				\IPS\Db::i()->update( 'core_sys_conf_settings', array( 'conf_value' => (string) $manifest ), array( 'conf_key=?', 'favicons_androidManifest' ) );
+				unset( \IPS\Data\Store::i()->settings );
 			}
 
 			return $values;
@@ -299,6 +304,8 @@ class _manage extends \IPS\Dispatcher\Controller
 	 */
 	public function _stepWindows( $data )
 	{
+		$s = \IPS\Settings::i();
+
 		$form = new Form( 'windows', 'continue', \IPS\Http\Url::internal( 'app=favicons&module=favicons&controller=manage&do=wizard&_step=favicons_windows' ) );
 		$form->ajaxOutput = TRUE;
 		$form->class = 'ipsForm_vertical';
@@ -335,8 +342,8 @@ class _manage extends \IPS\Dispatcher\Controller
 				/**
 				 * Create the browserconfig.xml file
 				 *
-				 * For some reason, it seems we have to manually check for our XML configuration file, though we don't seem
-				 * to have to do this for the manifest.json file (and I have no idea why at the moment)
+				 * For some reason, it seems we have to manually check for our XML configuration file, though we don't
+				 * seem to have to do this for the manifest.json file (and I have no idea why at the moment)
 				 */
 				try
 				{
@@ -344,7 +351,14 @@ class _manage extends \IPS\Dispatcher\Controller
 					$oldFile->delete();
 				} catch ( \Exception $e ) {}
 
-				\IPS\File::create( 'favicons_Favicons', 'browserconfig.xml', Favicon::microsoftBrowserConfig(), 'favicons', FALSE, NULL, FALSE );
+				$browserConfig = \IPS\File::create( 'favicons_Favicons', 'browserconfig.xml', Favicon::microsoftBrowserConfig(), 'favicons', FALSE, NULL, FALSE );
+
+				/* Store the browserconfig filename in settings */
+				$s->favicons_microsoftBrowserConfig = (string) $browserConfig;
+				$s->favicons_setUpComplete = 1;
+				\IPS\Db::i()->update( 'core_sys_conf_settings', array( 'conf_value' => (string) $browserConfig ), array( 'conf_key=?', 'favicons_microsoftBrowserConfig' ) );
+				\IPS\Db::i()->update( 'core_sys_conf_settings', array( 'conf_value' => 1 ), array( 'conf_key=?', 'favicons_setUpComplete' ) );
+				unset( \IPS\Data\Store::i()->settings );
 			}
 
 			return $values;

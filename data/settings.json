@@ -12,11 +12,19 @@
         "default": "FFFFFF"
     },
     {
+        "key": "favicons_androidManifest",
+        "default": ""
+    },
+    {
         "key": "favicons_androidStandalone",
         "default": "0"
     },
     {
         "key": "favicons_iosFancy",
+        "default": ""
+    },
+    {
+        "key": "favicons_microsoftBrowserConfig",
         "default": ""
     },
     {
@@ -26,6 +34,10 @@
     {
         "key": "favicons_msTileColor_custom",
         "default": ""
+    },
+    {
+        "key": "favicons_setUpComplete",
+        "default": "0"
     },
     {
         "key": "settings_favicons_androidStandalone_orientation",
