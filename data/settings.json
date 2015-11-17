@@ -20,6 +20,14 @@
         "default": "0"
     },
     {
+        "key": "favicons_androidStandalone_orientation",
+        "default": ""
+    },
+    {
+        "key": "favicons_androidStandalone_startUrl",
+        "default": ""
+    },
+    {
         "key": "favicons_iosFancy",
         "default": ""
     },
@@ -38,13 +46,5 @@
     {
         "key": "favicons_setUpComplete",
         "default": "0"
-    },
-    {
-        "key": "settings_favicons_androidStandalone_orientation",
-        "default": ""
-    },
-    {
-        "key": "settings_favicons_androidStandalone_startUrl",
-        "default": ""
     }
 ]

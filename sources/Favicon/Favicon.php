@@ -440,6 +440,9 @@ class _Favicon extends \IPS\Patterns\ActiveRecord
 				'icons' => []
 		];
 
+		if ( $s->favicons_androidAppShortName )
+			$manifest['short_name'] = $s->favicons_androidAppShortName;
+
 		/* Additional data to be added only if standalone mode is enabled */
 		if ( $s->favicons_androidStandalone )
 		{

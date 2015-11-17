@@ -1,8 +1,8 @@
 {
     "admin": {
         "favicons": {
-            "default_controller": "",
-            "protected": false
+            "default_controller": "manage",
+            "protected": 0
         }
     }
 }

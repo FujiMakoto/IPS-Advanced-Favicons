@@ -3,8 +3,15 @@
 
 namespace IPS\favicons\modules\admin\favicons;
 
+use IPS\Db;
 use IPS\favicons\Favicon;
 use IPS\Helpers\Form;
+use IPS\Http\Url;
+use IPS\Member;
+use IPS\Output;
+use IPS\Request;
+use IPS\Settings;
+use IPS\Theme;
 
 /* To prevent PHP errors (extending class does not exist) revealing path */
 if ( !defined( '\IPS\SUITE_UNIQUE_KEY' ) )
@@ -35,9 +42,9 @@ class _manage extends \IPS\Dispatcher\Controller
 	 * @return	void
 	 */
 	protected function manage()
-	{		
+	{
 		/* Create the table */
-		$table = new \IPS\Helpers\Table\Db( 'favicons_favicons', \IPS\Http\Url::internal( 'app=favicons&module=favicons&controller=manage' ) );
+		$table = new \IPS\Helpers\Table\Db( 'favicons_favicons', Url::internal( 'app=favicons&module=favicons&controller=manage' ) );
 		$table->langPrefix = 'favicons_';
 
 		/* Columns we need */
@@ -55,10 +62,10 @@ class _manage extends \IPS\Dispatcher\Controller
 
 		/* Filters */
 		$table->filters = array(
-				'favicons_filter_android'   => 'type=' . \IPS\favicons\Favicon::ANDROID,
-				'favicons_filter_ios'       => 'type=' . \IPS\favicons\Favicon::IOS,
-				'favicons_filter_safari'    => 'type=' . \IPS\favicons\Favicon::SAFARI,
-				'favicons_filter_windows'   => 'type=' . \IPS\favicons\Favicon::WINDOWS,
+				'favicons_filter_android'   => 'type=' . Favicon::ANDROID,
+				'favicons_filter_ios'       => 'type=' . Favicon::IOS,
+				'favicons_filter_safari'    => 'type=' . Favicon::SAFARI,
+				'favicons_filter_windows'   => 'type=' . Favicon::WINDOWS,
 		);
 
 		/* Custom parsers */
@@ -68,11 +75,11 @@ class _manage extends \IPS\Dispatcher\Controller
 				{
 					$favicon = Favicon::constructFromData( $row );
 					$imgUrl = (string) $favicon->file->url;
-					return \IPS\Theme::i()->getTemplate( 'manage' )->faviconPreview( $imgUrl, $favicon->name );
+					return Theme::i()->getTemplate( 'manage' )->faviconPreview( $imgUrl, $favicon->name );
 				},
 				'type'  => function ( $val, $row ) use ( $self )
 				{
-					$type = \IPS\Member::loggedIn()->language()->addToStack( "favicons_type_{$row['type']}" );
+					$type = Member::loggedIn()->language()->addToStack( "favicons_type_{$row['type']}" );
 					$type = $type . " ( {$row['width']} x {$row['height']} )";
 					return $type;
 				},
@@ -85,28 +92,45 @@ class _manage extends \IPS\Dispatcher\Controller
 
 		/* Specify the buttons */
 		$rootButtons = array();
-		if ( \IPS\Member::loggedIn()->hasAcpRestriction( 'favicons', 'favicons', 'favicons_create' ) )
+		if ( Member::loggedIn()->hasAcpRestriction( 'favicons', 'favicons', 'favicons_create' ) )
 		{
-			$rootButtons[ 'wizard' ] = array(
+			$rootButtons['wizard'] = array(
 					'icon'  => 'magic',
 					'title' => 'favicons_wizard_run',
-					'link'  => \IPS\Http\Url::internal( 'app=favicons&module=favicons&controller=manage&do=wizard&_new=1' ),
-					'data'  => array(
+					'link'  => Url::internal( 'app=favicons&module=favicons&controller=manage&do=wizard&_new=1' ),
+					'data'  => [
 							'ipsDialog'                 => '',
-							'ipsDialog-title'           => \IPS\Member::loggedIn()->language()->addToStack(
+							'ipsDialog-title'           => Member::loggedIn()->language()->addToStack(
 									'favicons_wizard_title'
 							),
 							//'ipsDialog-fixed'           => '',
 							//'ipsDialog-size'            => 'fullscreen',
 							'ipsDialog-remoteSubmit'    => 'true'
-					)
+					]
+			);
+		}
+		if ( Member::loggedIn()->hasAcpRestriction( 'favicons', 'favicons', 'settings_manage' ) )
+		{
+			$class = Settings::i()->favicons_setUpComplete ? '' : 'ipsButton_disabled';
+			$rootButtons['settings'] = array(
+					'icon'  => 'cog',
+					'class' => $class,
+					'title' => 'favicons_settings',
+					'link'  => Url::internal( 'app=favicons&module=favicons&controller=manage&do=settings' ),
+					'data'  => [
+							'ipsDialog'                 => '',
+							'ipsDialog-title'           => Member::loggedIn()->language()->addToStack(
+									'favicons_settings'
+							)
+					]
 			);
 		}
 		$table->rootButtons = $rootButtons;
 
 		/* Display */
-		\IPS\Output::i()->cssFiles  = array_merge( \IPS\Output::i()->cssFiles, \IPS\Theme::i()->css( 'favicons.css', 'favicons', 'admin' ) );
-		\IPS\Output::i()->output    = \IPS\Theme::i()->getTemplate( 'global', 'core' )->block( 'title', (string) $table );
+		Output::i()->title     = Member::loggedIn()->language()->addToStack( 'favicons_manage_title' );
+		Output::i()->cssFiles  = array_merge( Output::i()->cssFiles, Theme::i()->css( 'favicons.css', 'favicons', 'admin' ) );
+		Output::i()->output    = Theme::i()->getTemplate( 'global', 'core' )->block( 'title', (string) $table );
 	}
 
 	/**
@@ -129,7 +153,7 @@ class _manage extends \IPS\Dispatcher\Controller
 				'favicons_safari'   => array( $this, '_stepSafari' ),
 				'favicons_windows'  => array( $this, '_stepWindows' ),
 				'favicons_review'   => array( $this, '_stepReview' ),
-		), \IPS\Http\Url::internal( 'app=favicons&module=favicons&controller=manage&do=wizard' ), TRUE, $initialData );
+		), Url::internal( 'app=favicons&module=favicons&controller=manage&do=wizard' ), TRUE, $initialData );
 
 		/**
 		 * Output
@@ -140,7 +164,7 @@ class _manage extends \IPS\Dispatcher\Controller
 //			return;
 //		}
 
-		\IPS\Output::i()->output = $wizard;
+		Output::i()->output = $wizard;
 	}
 
 	/**
@@ -151,7 +175,7 @@ class _manage extends \IPS\Dispatcher\Controller
 	 */
 	public function _stepMaster( $data )
 	{
-		$form = new Form( 'master', 'continue', \IPS\Http\Url::internal( 'app=favicons&module=favicons&controller=manage&do=wizard&_step=favicons_master' ) );
+		$form = new Form( 'master', 'continue', Url::internal( 'app=favicons&module=favicons&controller=manage&do=wizard&_step=favicons_master' ) );
 		$form->ajaxOutput = TRUE;
 		$form->class = 'ipsForm_vertical';
 
@@ -166,7 +190,7 @@ class _manage extends \IPS\Dispatcher\Controller
 
 		if ( $values = $form->values() )
 		{
-			if ( !isset( \IPS\Request::i()->ajaxValidate ) )
+			if ( !isset( Request::i()->ajaxValidate ) )
 			{
 				$ext = pathinfo( $values['favicons_master']->filename, \PATHINFO_EXTENSION );
 				$contents = $values['favicons_master']->contents();
@@ -190,7 +214,7 @@ class _manage extends \IPS\Dispatcher\Controller
 			return $values;
 		}
 
-		return \IPS\Theme::i()->getTemplate( 'wizard' )->step1( $form );
+		return Theme::i()->getTemplate( 'wizard' )->step1( $form );
 	}
 
 	/**
@@ -201,7 +225,7 @@ class _manage extends \IPS\Dispatcher\Controller
 	 */
 	public function _stepAndroid( $data )
 	{
-		$form = new Form( 'android', 'continue', \IPS\Http\Url::internal( 'app=favicons&module=favicons&controller=manage&do=wizard&_step=favicons_android' ) );
+		$form = new Form( 'android', 'continue', Url::internal( 'app=favicons&module=favicons&controller=manage&do=wizard&_step=favicons_android' ) );
 		$form->ajaxOutput = TRUE;
 		$form->class = 'ipsForm_vertical';
 
@@ -232,7 +256,7 @@ class _manage extends \IPS\Dispatcher\Controller
 
 		if ( $values = $form->values() )
 		{
-			if ( !isset( \IPS\Request::i()->ajaxValidate ) )
+			if ( !isset( Request::i()->ajaxValidate ) )
 			{
 				$form->saveAsSettings( $values );
 				Favicon::generateIcons( Favicon::ANDROID );
@@ -242,14 +266,14 @@ class _manage extends \IPS\Dispatcher\Controller
 
 				/* Store the manifest filename in settings */
 				$s->favicons_androidManifest = (string) $manifest;
-				\IPS\Db::i()->update( 'core_sys_conf_settings', array( 'conf_value' => (string) $manifest ), array( 'conf_key=?', 'favicons_androidManifest' ) );
+				Db::i()->update( 'core_sys_conf_settings', array( 'conf_value' => (string) $manifest ), array( 'conf_key=?', 'favicons_androidManifest' ) );
 				unset( \IPS\Data\Store::i()->settings );
 			}
 
 			return $values;
 		}
 
-		return \IPS\Theme::i()->getTemplate( 'wizard' )->step2( $form );
+		return Theme::i()->getTemplate( 'wizard' )->step2( $form );
 	}
 
 	/**
@@ -260,7 +284,7 @@ class _manage extends \IPS\Dispatcher\Controller
 	 */
 	public function _stepIOS( $data )
 	{
-		$form = new Form( 'ios', 'continue', \IPS\Http\Url::internal( 'app=favicons&module=favicons&controller=manage&do=wizard&_step=favicons_ios' ) );
+		$form = new Form( 'ios', 'continue', Url::internal( 'app=favicons&module=favicons&controller=manage&do=wizard&_step=favicons_ios' ) );
 		$form->ajaxOutput = TRUE;
 		$form->class = 'ipsForm_vertical';
 
@@ -268,7 +292,7 @@ class _manage extends \IPS\Dispatcher\Controller
 
 		if ( $values = $form->values() )
 		{
-			if ( !isset( \IPS\Request::i()->ajaxValidate ) )
+			if ( !isset( Request::i()->ajaxValidate ) )
 			{
 				$form->saveAsSettings( $values );
 				Favicon::generateIcons( Favicon::IOS );
@@ -277,7 +301,7 @@ class _manage extends \IPS\Dispatcher\Controller
 			return $values;
 		}
 
-		return \IPS\Theme::i()->getTemplate( 'wizard' )->step3( $form );
+		return Theme::i()->getTemplate( 'wizard' )->step3( $form );
 	}
 
 	/**
@@ -288,7 +312,7 @@ class _manage extends \IPS\Dispatcher\Controller
 	 */
 	public function _stepSafari( $data )
 	{
-		$form = new Form( 'safari', 'continue', \IPS\Http\Url::internal( 'app=favicons&module=favicons&controller=manage&do=wizard&_step=favicons_safari' ) );
+		$form = new Form( 'safari', 'continue', Url::internal( 'app=favicons&module=favicons&controller=manage&do=wizard&_step=favicons_safari' ) );
 		$form->ajaxOutput = TRUE;
 		$form->class = 'ipsForm_vertical';
 
@@ -301,7 +325,7 @@ class _manage extends \IPS\Dispatcher\Controller
 
 		if ( $values = $form->values() )
 		{
-			if ( !isset( \IPS\Request::i()->ajaxValidate ) )
+			if ( !isset( Request::i()->ajaxValidate ) )
 			{
 				if ( $values['favicons_safariSvg'] )
 				{
@@ -322,7 +346,7 @@ class _manage extends \IPS\Dispatcher\Controller
 			return $values;
 		}
 
-		return \IPS\Theme::i()->getTemplate( 'wizard' )->step3( $form );
+		return Theme::i()->getTemplate( 'wizard' )->step3( $form );
 	}
 
 	/**
@@ -335,7 +359,7 @@ class _manage extends \IPS\Dispatcher\Controller
 	{
 		$s = \IPS\Settings::i();
 
-		$form = new Form( 'windows', 'continue', \IPS\Http\Url::internal( 'app=favicons&module=favicons&controller=manage&do=wizard&_step=favicons_windows' ) );
+		$form = new Form( 'windows', 'continue', Url::internal( 'app=favicons&module=favicons&controller=manage&do=wizard&_step=favicons_windows' ) );
 		$form->ajaxOutput = TRUE;
 		$form->class = 'ipsForm_vertical';
 
@@ -364,7 +388,7 @@ class _manage extends \IPS\Dispatcher\Controller
 
 		if ( $values = $form->values() )
 		{
-			if ( !isset( \IPS\Request::i()->ajaxValidate ) )
+			if ( !isset( Request::i()->ajaxValidate ) )
 			{
 				$form->saveAsSettings( $values );
 				Favicon::generateIcons( Favicon::WINDOWS );
@@ -386,15 +410,15 @@ class _manage extends \IPS\Dispatcher\Controller
 				/* Store the browserconfig filename in settings */
 				$s->favicons_microsoftBrowserConfig = (string) $browserConfig;
 				$s->favicons_setUpComplete = 1;
-				\IPS\Db::i()->update( 'core_sys_conf_settings', array( 'conf_value' => (string) $browserConfig ), array( 'conf_key=?', 'favicons_microsoftBrowserConfig' ) );
-				\IPS\Db::i()->update( 'core_sys_conf_settings', array( 'conf_value' => 1 ), array( 'conf_key=?', 'favicons_setUpComplete' ) );
+				Db::i()->update( 'core_sys_conf_settings', array( 'conf_value' => (string) $browserConfig ), array( 'conf_key=?', 'favicons_microsoftBrowserConfig' ) );
+				Db::i()->update( 'core_sys_conf_settings', array( 'conf_value' => 1 ), array( 'conf_key=?', 'favicons_setUpComplete' ) );
 				unset( \IPS\Data\Store::i()->settings );
 			}
 
 			return $values;
 		}
 
-		return \IPS\Theme::i()->getTemplate( 'wizard' )->step4( $form );
+		return Theme::i()->getTemplate( 'wizard' )->step4( $form );
 	}
 
 
@@ -406,16 +430,138 @@ class _manage extends \IPS\Dispatcher\Controller
 	 */
 	public function _stepReview( $data )
 	{
-		$rfgTestUrl = \IPS\Http\Url::external( 'http://realfavicongenerator.net/favicon_checker' )->setQueryString( 'site', \IPS\Http\Url::baseUrl() )->makeSafeForAcp();
+		$rfgTestUrl = Url::external( 'http://realfavicongenerator.net/favicon_checker' )->setQueryString( 'site', Url::baseUrl() )->makeSafeForAcp();
 
 		$form = new Form( 'review', 'Complete setup' );
 		$form->ajaxOutput = TRUE;
 		$form->hiddenValues['finished'] = TRUE;
 		if ( $values = $form->values() )
 		{
-			\IPS\Output::i()->redirect( \IPS\Http\Url::internal( 'app=favicons&module=favicons&controller=manage' ) );
+			Output::i()->redirect( Url::internal( 'app=favicons&module=favicons&controller=manage' ) );
 		}
 
-		return \IPS\Theme::i()->getTemplate( 'wizard' )->step5( $form, $rfgTestUrl );
+		return Theme::i()->getTemplate( 'wizard' )->step5( $form, $rfgTestUrl );
+	}
+
+	/**
+	 * Wizard step: Safari images
+	 *
+	 * @return	string|array
+	 */
+	public function settings()
+	{
+		$s = Settings::i();
+		if ( !$s->favicons_setUpComplete )
+		{
+			return \IPS\Output::i()->error( 'favicons_error_runSetupFirst', '1FAVI201/1', 404 );
+		}
+
+		$form = new Form( 'settings' );
+
+		/**
+		 * Android Chrome
+		 */
+		$form->addTab( 'favicons_androidTab' );
+		$form->addHeader( 'favicons_androidHeader' );
+
+		$form->add( new Form\Text( 'favicons_androidAppName', $s->favicons_androidAppName, TRUE ) );
+		$form->add( new Form\Text( 'favicons_androidAppShortName', $s->favicons_androidAppShortName, FALSE ) );
+		$form->add( new Form\Color( 'favicons_androidColor', $s->favicons_androidColor ) );
+
+		# Browser mode
+		$form->add( new Form\YesNo( 'favicons_androidStandalone', $s->favicons_androidStandalone, FALSE,
+				[
+						'togglesOn' => [
+								'settings_favicons_androidStandalone_startUrl',
+								'settings_favicons_androidStandalone_orientation'
+						]
+				]
+		) );
+		$form->add( new Form\Url( 'favicons_androidStandalone_startUrl', $s->favicons_androidStandalone_startUrl ) );
+		$form->add( new Form\Select( 'favicons_androidStandalone_orientation', $s->favicons_androidStandalone_orientation, FALSE,
+				[
+						'options' => [
+								'default'   => 'favicons_androidStandalone_orientation_default',
+								'portrait'  => 'favicons_androidStandalone_orientation_portrait',
+								'landscape' => 'favicons_androidStandalone_orientation_landscape'
+						]
+				]
+		) );
+
+		/**
+		 * iOS - Placeholder, currently has not usable settings
+		 */
+		$form->addTab( 'favicons_iosTab' );
+		$form->addHeader( 'favicons_iosHeader' );
+
+		$form->add( new Form\YesNo( 'favicons_iosFancy', TRUE ) );
+
+		/**
+		 * Microsoft Windows 8 and 10
+		 */
+		$form->addTab( 'favicons_msTab' );
+		$form->addHeader( 'favicons_msHeader' );
+
+		# Tile color
+		$form->add( new Form\Select( 'favicons_msTileColor', $s->favicons_msTileColor, FALSE,
+				[
+						'options' => [
+								'#2d89ef'   => 'favicons_msTileColor_blue',
+								'#2b5797'   => 'favicons_msTileColor_darkBlue',
+								'#00aba9'   => 'favicons_msTileColor_teal',
+								'#9f00a7'   => 'favicons_msTileColor_lightPurple',
+								'#603cba'   => 'favicons_msTileColor_darkPurple',
+								'#b91d47'   => 'favicons_msTileColor_darkRed',
+								'#da532c'   => 'favicons_msTileColor_darkOrange',
+								'#ffc40d'   => 'favicons_msTileColor_yellow',
+								'#00a300'   => 'favicons_msTileColor_green'
+						],
+					// We don't use userSuppliedInput here because we want to be able to display a Color form, not Text
+						'unlimited'         => 'custom',
+						'unlimitedLang'     => 'favicons_msTileColor_custom',
+						'unlimitedToggles'  => ['settings_favicons_msTileColor_custom']
+				]
+		) );
+		$form->add( new Form\Color( 'favicons_msTileColor_custom', $s->favicons_msTileColor_custom ) );
+
+		/**
+		 * Save settings
+		 */
+		if ( $values = $form->values() )
+		{
+			$form->saveAsSettings( $values );
+
+			/* Regenerate our manifest.json and browserconfig.xml files */
+			try
+			{
+				$oldBrowserConfig = \IPS\File::get( 'favicons_Favicons', 'favicons/browserconfig.xml' );
+				$oldBrowserConfig->delete();
+			} catch ( \Exception $e ) {}
+
+			$manifest = \IPS\File::create( 'favicons_Favicons', 'manifest.json', Favicon::androidManifest(), 'favicons', FALSE, NULL, FALSE );
+			$browserConfig = \IPS\File::create( 'favicons_Favicons', 'browserconfig.xml', Favicon::microsoftBrowserConfig(), 'favicons', FALSE, NULL, FALSE );
+
+			/* Update our setting values and clear cached data */
+			$s->favicons_microsoftBrowserConfig = (string) $browserConfig;
+			Db::i()->update( 'core_sys_conf_settings', array( 'conf_value' => (string) $browserConfig ), array( 'conf_key=?', 'favicons_microsoftBrowserConfig' ) );
+
+			$s->favicons_androidManifest = (string) $manifest;
+			Db::i()->update( 'core_sys_conf_settings', array( 'conf_value' => (string) $manifest ), array( 'conf_key=?', 'favicons_androidManifest' ) );
+
+			unset( \IPS\Data\Store::i()->settings );
+			unset( \IPS\Data\Store::i()->favicons_html );
+
+			if ( Request::i()->isAjax() )
+			{
+				Output::i()->json( 'success' );
+				return;
+			}
+			Output::i()->redirect( Url::internal( 'app=favicons&module=favicons&controller=manage' ), '', 302 );
+		}
+
+		/**
+		 * Output
+		 */
+		\IPS\Output::i()->output = $form;
 	}
 }

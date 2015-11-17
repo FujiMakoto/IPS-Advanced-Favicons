@@ -8,8 +8,6 @@ $lang = array(
 	/**
 	 * [Admin] Settings
 	 */
-	'menu__favicons_favicons_settings'  => 'Settings',
-
 	# Android
 	'favicons_androidTab'       => 'Android',
 	'favicons_androidHeader'    => 'Android Chrome',
@@ -34,7 +32,7 @@ In particular, it lets you enforce the start URL and screen orientation. It also
 	'favicons_androidStandalone_orientation_landscape'  => 'Landscape',
 
 	# iOS
-	'favicons_iosTab'       => 'iOS',
+	'favicons_iosTab'       => 'Apple iOS',
 	'favicons_iosHeader'    => 'iOS - Web Clip',
 
 	# Microsoft
@@ -59,12 +57,17 @@ In particular, it lets you enforce the start URL and screen orientation. It also
 	/**
 	 * [Admin] Manage
 	 */
+	'menu__favicons_favicons_manage'  => 'Manage',
+
+	'favicons_manage_title' => 'Manage Favicons',
 	'favicons_wizard_title' => 'Favicon Generation Wizard',
-	'favicons_wizard_run'   => 'Run Wizard',
+	'favicons_wizard_run'   => 'Setup Wizard',
 
 	# Table
 	'favicons_file' => 'Favicon',
 	'favicons_type' => 'Favicon Type',
+
+	'favicons_settings' => 'Favicon Settings',
 
 	'favicons_type_0'   => '<i class="fa fa-image"></i> &nbsp;Original',
 	'favicons_type_1'   => '<i class="fa fa-android"></i> &nbsp;Android',
@@ -123,4 +126,7 @@ This is optional and can be skipped if you do not have a SVG image to use. Safar
 	'favicons_filter_ios'       => 'iOS',
 	'favicons_filter_safari'    => 'Safari',
 	'favicons_filter_windows'   => 'Windows',
+
+	# Errors
+	'favicons_error_runSetupFirst'  => 'You must complete the Setup Wizard before accessing the Favicon Settings page'
 );
