@@ -21,14 +21,14 @@ if ( !defined( '\IPS\SUITE_UNIQUE_KEY' ) )
 }
 
 /**
- * manage
+ * Manage favicons
  */
 class _manage extends \IPS\Dispatcher\Controller
 {
 	/**
 	 * Execute
 	 *
-	 * @return	void
+	 * @return  void
 	 */
 	public function execute()
 	{
@@ -37,9 +37,9 @@ class _manage extends \IPS\Dispatcher\Controller
 	}
 	
 	/**
-	 * Manage
+	 * Display Favicons table
 	 *
-	 * @return	void
+	 * @return  void
 	 */
 	protected function manage()
 	{
@@ -134,7 +134,9 @@ class _manage extends \IPS\Dispatcher\Controller
 	}
 
 	/**
-	 * Wizard
+	 * Setup Wizard
+	 *
+	 * @return  void
 	 */
 	public function wizard()
 	{
@@ -166,8 +168,8 @@ class _manage extends \IPS\Dispatcher\Controller
 	/**
 	 * Wizard step: Upload a master / base image to use as the favicon
 	 *
-	 * @param	array	$data	The current wizard data
-	 * @return	string|array
+	 * @param   array   $data   The current wizard data
+	 * @return  string|array
 	 */
 	public function _stepMaster( $data )
 	{
@@ -216,8 +218,8 @@ class _manage extends \IPS\Dispatcher\Controller
 	/**
 	 * Wizard step: Android images
 	 *
-	 * @param	array	$data	The current wizard data
-	 * @return	string|array
+	 * @param   array   $data   The current wizard data
+	 * @return  string|array
 	 */
 	public function _stepAndroid( $data )
 	{
@@ -275,8 +277,8 @@ class _manage extends \IPS\Dispatcher\Controller
 	/**
 	 * Wizard step: iOS images
 	 *
-	 * @param	array	$data	The current wizard data
-	 * @return	string|array
+	 * @param   array   $data   The current wizard data
+	 * @return  string|array
 	 */
 	public function _stepIOS( $data )
 	{
@@ -301,10 +303,10 @@ class _manage extends \IPS\Dispatcher\Controller
 	}
 
 	/**
-	 * Wizard step: iOS images
+	 * Wizard step: Safari images
 	 *
-	 * @param	array	$data	The current wizard data
-	 * @return	string|array
+	 * @param   array   $data   The current wizard data
+	 * @return  string|array
 	 */
 	public function _stepSafari( $data )
 	{
@@ -346,10 +348,10 @@ class _manage extends \IPS\Dispatcher\Controller
 	}
 
 	/**
-	 * Wizard step: Safari images
+	 * Wizard step: Windows images
 	 *
-	 * @param	array	$data	The current wizard data
-	 * @return	string|array
+	 * @param   array   $data   The current wizard data
+	 * @return  string|array
 	 */
 	public function _stepWindows( $data )
 	{
@@ -419,10 +421,10 @@ class _manage extends \IPS\Dispatcher\Controller
 
 
 	/**
-	 * Wizard step: Safari images
+	 * Wizard step: Completion / review
 	 *
-	 * @param	array	$data	The current wizard data
-	 * @return	string|array
+	 * @param   array   $data   The current wizard data
+	 * @return  string|array
 	 */
 	public function _stepReview( $data )
 	{
@@ -440,9 +442,9 @@ class _manage extends \IPS\Dispatcher\Controller
 	}
 
 	/**
-	 * Wizard step: Safari images
+	 * Favicon Settings
 	 *
-	 * @return	string|array
+	 * @return  void
 	 */
 	public function settings()
 	{

@@ -85,7 +85,7 @@ class _Favicon extends \IPS\Patterns\ActiveRecord
 	public static $appleHtmlTemplate = '<link rel="apple-touch-icon" sizes="%2$s" href="%1$s">';
 
 	/**
-	 * @brief   Apple favicon sizes
+	 * @brief   Windows favicon sizes
 	 */
 	public static $windowsSizes = [
 			[70, 70],
@@ -93,12 +93,12 @@ class _Favicon extends \IPS\Patterns\ActiveRecord
 	];
 
 	/**
-	 * @brief   Apple filename template
+	 * @brief   Windows filename template
 	 */
 	public static $windowsNameTemplate = 'mstile-%d-%d.%s';
 
 	/**
-	 * @brief   Standard HTML template
+	 * @brief   Windows HTML template
 	 */
 	public static $windowsHtmlTemplate = '<meta name="msapplication-TileImage" content="%1$s">';
 
@@ -174,6 +174,11 @@ class _Favicon extends \IPS\Patterns\ActiveRecord
 		return "{$this->width}x{$this->height}";
 	}
 
+	/**
+	 * Get favicon HTML
+	 *
+	 * @return  null|string
+	 */
 	protected function get_html()
 	{
 		$type = NULL;
@@ -218,6 +223,55 @@ class _Favicon extends \IPS\Patterns\ActiveRecord
 		}
 	}
 
+	/**
+	 * Get all available favicons
+	 *
+	 * @param   int|null    $type   Optional device type to filter by.
+	 * @return  Favicon[]
+	 */
+	public static function favicons( $type = NULL )
+	{
+		$where = $type ? [ 'type=?', (int) $type ] : NULL;
+		$select = Db::i()->select( '*', static::$databaseTable, $where );
+
+		$return = [];
+		foreach ( $select as $row )
+		{
+			$return[] = static::constructFromData( $row );
+		}
+
+		return $return;
+	}
+
+	/**
+	 * Reset / delete all favicons and manifest files
+	 *
+	 * @return  void
+	 */
+	public static function reset()
+	{
+		$favicons = static::favicons();
+
+		foreach ( $favicons as $favicon )
+		{
+			$favicon->delete();
+		}
+
+		/* Reset the application setup status */
+		Settings::i()->favicons_setUpComplete = 0;
+		Db::i()->update( 'core_sys_conf_settings', array( 'conf_value' => 0 ), array( 'conf_key=?', 'favicons_setUpComplete' ) );
+		unset( \IPS\Data\Store::i()->settings );
+
+		/* Clear any cached HTML output for favicons */
+		unset( \IPS\Data\Store::i()->favicons_html );
+	}
+
+	/**
+	 * Get the HTML output for *all* favicons and manifest files
+	 *
+	 * @param   bool|FALSE  $ignoreCache    Ignore HTML output cache
+	 * @return  string
+	 */
 	public static function html( $ignoreCache=FALSE )
 	{
 		if ( !$ignoreCache and isset( \IPS\Data\Store::i()->favicons_html ) )
@@ -255,36 +309,6 @@ class _Favicon extends \IPS\Patterns\ActiveRecord
 	}
 
 	/**
-	 * @param   int|null    $type   Optional favicon type to filter by.
-	 * @return  \IPS\Db\Select
-	 */
-	public static function favicons( $type = NULL )
-	{
-		$where = $type ? [ 'type=?', (int) $type ] : NULL;
-		$select = Db::i()->select( '*', static::$databaseTable, $where );
-
-		$return = [];
-		foreach ( $select as $row )
-		{
-			$return[] = static::constructFromData( $row );
-		}
-
-		return $return;
-	}
-
-	/**
-	 * Get the master image
-
-	 *
-*@return  File
-	 */
-	public static function baseImage()
-	{
-		$file = Db::i()->select( 'file', static::$databaseTable, [ 'type=?', static::BASE ], 'id DESC' )->first();
-		return File::get( 'favicons_Favicons', $file );
-	}
-
-	/**
 	 * Load a favicon by its filename
 	 *
 	 * @param   string  $file
@@ -296,24 +320,23 @@ class _Favicon extends \IPS\Patterns\ActiveRecord
 		return static::constructFromData( $result );
 	}
 
-	public static function reset()
+	/**
+	 * Get the master image
+	 *
+	 * @return  File
+	 */
+	public static function baseImage()
 	{
-		$favicons = static::favicons();
-
-		foreach ( $favicons as $favicon )
-		{
-			$favicon->delete();
-		}
-
-		/* Reset the application setup status */
-		Settings::i()->favicons_setUpComplete = 0;
-		Db::i()->update( 'core_sys_conf_settings', array( 'conf_value' => 0 ), array( 'conf_key=?', 'favicons_setUpComplete' ) );
-		unset( \IPS\Data\Store::i()->settings );
-
-		/* Clear any cached HTML output for favicons */
-		unset( \IPS\Data\Store::i()->favicons_html );
+		$file = Db::i()->select( 'file', static::$databaseTable, [ 'type=?', static::BASE ], 'id DESC' )->first();
+		return File::get( 'favicons_Favicons', $file );
 	}
 
+	/**
+	 * Generate icons for the specified device type
+	 *
+	 * @param   int $for    The device type to generate icons for
+	 * @return  void
+	 */
 	public static function generateIcons( $for=self::MASTER )
 	{
 		switch ( $for )
@@ -475,6 +498,11 @@ class _Favicon extends \IPS\Patterns\ActiveRecord
 		return $json ? json_encode( $manifest ) : $manifest;
 	}
 
+	/**
+	 * Get the HTML output for Android's manifest.json
+	 *
+	 * @return  string
+	 */
 	public static function androidManifestHtml()
 	{
 		$s = Settings::i();
@@ -526,6 +554,11 @@ class _Favicon extends \IPS\Patterns\ActiveRecord
 		return $xml->asXML();
 	}
 
+	/**
+	 * Get the HTML output for Microsoft's browserconfig.xml
+	 *
+	 * @return  string
+	 */
 	public static function microsoftBrowserConfigHtml()
 	{
 		$s = Settings::i();
