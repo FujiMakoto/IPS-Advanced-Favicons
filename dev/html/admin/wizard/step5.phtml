@@ -1,23 +1,9 @@
-<ips:template parameters="$rfgTestUrl" />
+<ips:template parameters="$form" />
 <div class="ipsContained ipsPad_top">
 	<div class="ipsType_center">
-		<h1>{lang="favicons_reviewHeader"}</h1>
-		<h4>{lang="favicons_review_hDesc"}</h4>
-		<!--<p>That's it! Your website should now have favicons that are compliant with all devices. Want to test it out? Follow the link below!</p>-->
-		<div class="ipsPad_double">
-			<ul class="ipsList_inline">
-				<li>
-					<a class="ipsButton ipsButton_primary" href="{$rfgTestUrl}" target="_blank">
-						{lang="favicons_reviewCheck"}
-					</a>
-				</li>
-
-				<li>
-					<a class="ipsButton ipsButton_primary" href="{url="app=favicons&module=favicons&controller=manage"}">
-						{lang="favicons_reviewFinish"}
-					</a>
-				</li>
-			</ul>
-		</div>
+		<h1>{lang="favicons_windowsHeader"}</h1>
+		<h4>{lang="favicons_windows_hDesc"}</h4>
 	</div>
+
+	{$form|raw}
 </div>

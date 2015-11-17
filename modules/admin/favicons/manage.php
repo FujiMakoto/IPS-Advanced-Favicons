@@ -357,7 +357,7 @@ class _manage extends \IPS\Dispatcher\Controller
 			return $values;
 		}
 
-		return Theme::i()->getTemplate( 'wizard' )->step3( $form );
+		return Theme::i()->getTemplate( 'wizard' )->step4( $form );
 	}
 
 	/**
@@ -429,7 +429,7 @@ class _manage extends \IPS\Dispatcher\Controller
 			return $values;
 		}
 
-		return Theme::i()->getTemplate( 'wizard' )->step4( $form );
+		return Theme::i()->getTemplate( 'wizard' )->step5( $form );
 	}
 
 
@@ -451,7 +451,7 @@ class _manage extends \IPS\Dispatcher\Controller
 			Output::i()->redirect( Url::internal( 'app=favicons&module=favicons&controller=manage' ) );
 		}
 
-		return Theme::i()->getTemplate( 'wizard' )->step5( $form, $rfgTestUrl );
+		return Theme::i()->getTemplate( 'wizard' )->step6( $form, $rfgTestUrl );
 	}
 
 	/**
