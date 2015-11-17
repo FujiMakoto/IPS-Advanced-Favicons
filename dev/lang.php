@@ -68,6 +68,9 @@ In particular, it lets you enforce the start URL and screen orientation. It also
 	'favicons_wizard_title' => 'Favicon Generation Wizard',
 	'favicons_wizard_run'   => 'Setup Wizard',
 
+	'favicons_reset'            => 'Delete Favicons',
+	'favicons_reset_success'    => 'All favicons deleted successfully',
+
 	# Table
 	'favicons_file' => 'Favicon',
 	'favicons_type' => 'Favicon Type',
@@ -133,5 +136,6 @@ This is optional and can be skipped if you do not have a SVG image to use. Safar
 	'favicons_filter_windows'   => 'Windows',
 
 	# Errors
-	'favicons_error_runSetupFirst'  => 'You must complete the Setup Wizard before accessing the Favicon Settings page'
+	'favicons_error_runSetupFirst'      => 'You must complete the Setup Wizard before accessing the Favicon Settings page',
+	'favicons_error_noFaviconsToDelete' => 'You need to create some favicons before you can delete them!'
 );

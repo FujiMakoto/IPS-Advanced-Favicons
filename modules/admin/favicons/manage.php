@@ -4,12 +4,14 @@
 namespace IPS\favicons\modules\admin\favicons;
 
 use IPS\Db;
+use IPS\Dispatcher;
 use IPS\favicons\Favicon;
 use IPS\Helpers\Form;
 use IPS\Http\Url;
 use IPS\Member;
 use IPS\Output;
 use IPS\Request;
+use IPS\Session;
 use IPS\Settings;
 use IPS\Theme;
 
@@ -32,7 +34,7 @@ class _manage extends \IPS\Dispatcher\Controller
 	 */
 	public function execute()
 	{
-		\IPS\Dispatcher::i()->checkAcpPermission( 'favicons_manage' );
+		Dispatcher::i()->checkAcpPermission( 'favicons_manage' );
 		parent::execute();
 	}
 	
@@ -125,6 +127,17 @@ class _manage extends \IPS\Dispatcher\Controller
 					]
 			);
 		}
+		if ( Member::loggedIn()->hasAcpRestriction( 'favicons', 'favicons', 'favicons_create' ) )
+		{
+			$class = count( Favicon::favicons() ) ? '' : 'ipsButton_disabled ';
+			$rootButtons['reset'] = array(
+					'icon'  => 'trash',
+					'class' => $class . 'ipsButton_negative',
+					'title' => 'favicons_reset',
+					'link'  => Url::internal( 'app=favicons&module=favicons&controller=manage&do=reset' )->csrf(),
+					'data'  => ['delete' => TRUE]
+			);
+		}
 		$table->rootButtons = $rootButtons;
 
 		/* Display */
@@ -140,7 +153,7 @@ class _manage extends \IPS\Dispatcher\Controller
 	 */
 	public function wizard()
 	{
-		\IPS\Dispatcher::i()->checkAcpPermission( 'favicons_create' );
+		Dispatcher::i()->checkAcpPermission( 'favicons_create' );
 
 		$initialData = [];
 		try
@@ -448,12 +461,13 @@ class _manage extends \IPS\Dispatcher\Controller
 	 */
 	public function settings()
 	{
-		\IPS\Dispatcher::i()->checkAcpPermission( 'favicons_manage_settings' );
+		Dispatcher::i()->checkAcpPermission( 'favicons_manage_settings' );
 
 		$s = Settings::i();
 		if ( !$s->favicons_setUpComplete )
 		{
-			return \IPS\Output::i()->error( 'favicons_error_runSetupFirst', '1FAVI201/1', 404 );
+			Output::i()->error( 'favicons_error_runSetupFirst', '1FAVI201/1', 404 );
+			return;
 		}
 
 		$form = new Form( 'settings' );
@@ -562,6 +576,26 @@ class _manage extends \IPS\Dispatcher\Controller
 		/**
 		 * Output
 		 */
-		\IPS\Output::i()->output = $form;
+		Output::i()->output = $form;
+	}
+
+	/**
+	 * Reset / delete ALL favicon images and manifest files
+	 *
+	 * @return  void
+	 */
+	public function reset()
+	{
+		if ( !count( Favicon::favicons() ) )
+		{
+			Output::i()->error( 'favicons_error_noFaviconsToDelete', '1FAVI201/2', 404 );
+			return;
+		}
+
+		Session::i()->csrfCheck();
+		Dispatcher::i()->checkAcpPermission( 'favicons_create' );
+
+		Favicon::reset();
+		Output::i()->redirect( Url::internal( 'app=favicons&module=favicons&controller=manage' ), 'favicons_reset_success', 302 );
 	}
 }
