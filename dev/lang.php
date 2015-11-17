@@ -62,6 +62,20 @@ In particular, it lets you enforce the start URL and screen orientation. It also
 	'favicons_wizard_title' => 'Favicon Generation Wizard',
 	'favicons_wizard_run'   => 'Run Wizard',
 
+	# Table
+	'favicons_file' => 'Favicon',
+	'favicons_type' => 'Favicon Type',
+
+	'favicons_type_0'   => '<i class="fa fa-image"></i> &nbsp;Original',
+	'favicons_type_1'   => '<i class="fa fa-android"></i> &nbsp;Android',
+	'favicons_type_2'   => '<i class="fa fa-apple"></i> &nbsp;Apple iOS',
+	'favicons_type_3'   => '<i class="fa fa-safari"></i> &nbsp;Safari',
+	'favicons_type_4'   => '<i class="fa fa-windows"></i> &nbsp;Windows',
+	'favicons_type_9'   => '<i class="fa fa-image"></i> &nbsp;Standard Favicon',
+
+	/**
+	 * Wizard
+	 */
 	# Step 1 - Master
 	'favicons_master'       => 'Master Image',
 	'favicons_master_hDesc' => 'This is the base image that will be used to generate all of your sites favicons.<br>

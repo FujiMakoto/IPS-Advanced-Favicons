@@ -98,6 +98,16 @@
                         "length": [
                             null
                         ]
+                    },
+                    "type": {
+                        "type": "key",
+                        "name": "type",
+                        "columns": [
+                            "type"
+                        ],
+                        "length": [
+                            null
+                        ]
                     }
                 }
             }

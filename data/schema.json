@@ -97,6 +97,16 @@
                 "columns": [
                     "id"
                 ]
+            },
+            "type": {
+                "type": "key",
+                "name": "type",
+                "columns": [
+                    "type"
+                ],
+                "length": [
+                    null
+                ]
             }
         },
         "collation": "utf8mb4_unicode_ci",

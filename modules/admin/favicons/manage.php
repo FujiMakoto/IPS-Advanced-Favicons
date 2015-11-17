@@ -41,11 +41,17 @@ class _manage extends \IPS\Dispatcher\Controller
 		$table->langPrefix = 'favicons_';
 
 		/* Columns we need */
+		$table->include = array(
+				'file',
+				'type',
+				//'size'
+		);
 		$table->mainColumn = 'name';
 
 		/* Default sort options */
-		$table->sortBy = $table->sortBy ?: 'name';
+		$table->sortBy = $table->sortBy ?: 'type';
 		$table->sortDirection = $table->sortDirection ?: 'asc';
+		$table->noSort = ['file'];
 
 		/* Filters */
 		$table->filters = array(
@@ -53,6 +59,28 @@ class _manage extends \IPS\Dispatcher\Controller
 				'favicons_filter_ios'       => 'type=' . \IPS\favicons\Favicon::IOS,
 				'favicons_filter_safari'    => 'type=' . \IPS\favicons\Favicon::SAFARI,
 				'favicons_filter_windows'   => 'type=' . \IPS\favicons\Favicon::WINDOWS,
+		);
+
+		/* Custom parsers */
+		$self = $this;
+		$table->parsers = array(
+				'file'  => function ( $val, $row ) use ( $self )
+				{
+					$favicon = Favicon::constructFromData( $row );
+					$imgUrl = (string) $favicon->file->url;
+					return \IPS\Theme::i()->getTemplate( 'manage' )->faviconPreview( $imgUrl, $favicon->name );
+				},
+				'type'  => function ( $val, $row ) use ( $self )
+				{
+					$type = \IPS\Member::loggedIn()->language()->addToStack( "favicons_type_{$row['type']}" );
+					$type = $type . " ( {$row['width']} x {$row['height']} )";
+					return $type;
+				},
+				'size'  => function ( $val, $row ) use ( $self )
+				{
+					$favicon = Favicon::constructFromData( $row );
+					return $favicon->sizes;
+				}
 		);
 
 		/* Specify the buttons */
@@ -77,7 +105,8 @@ class _manage extends \IPS\Dispatcher\Controller
 		$table->rootButtons = $rootButtons;
 
 		/* Display */
-		\IPS\Output::i()->output	= \IPS\Theme::i()->getTemplate( 'global', 'core' )->block( 'title', (string) $table );
+		\IPS\Output::i()->cssFiles  = array_merge( \IPS\Output::i()->cssFiles, \IPS\Theme::i()->css( 'favicons.css', 'favicons', 'admin' ) );
+		\IPS\Output::i()->output    = \IPS\Theme::i()->getTemplate( 'global', 'core' )->block( 'title', (string) $table );
 	}
 
 	/**
@@ -324,7 +353,8 @@ class _manage extends \IPS\Dispatcher\Controller
 								'#ffc40d'   => 'favicons_msTileColor_yellow',
 								'#00a300'   => 'favicons_msTileColor_green'
 						],
-					// We don't use userSuppliedInput here because we want to be able to display a Color form, not Text
+
+						// We don't use userSuppliedInput here because we want to be able to display a Color form, not Text
 						'unlimited'         => 'custom',
 						'unlimitedLang'     => 'favicons_msTileColor_custom',
 						'unlimitedToggles'  => ['windows_favicons_msTileColor_custom']

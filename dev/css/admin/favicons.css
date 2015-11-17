@@ -1,0 +1,12 @@
+.faviconsPreviewImage {
+	width: 72px;
+	height: 72px;
+	line-height: 65px;
+	text-align: center;
+}
+
+.faviconsPreviewImage > img {
+	max-width: inherit;
+	max-height: inherit;
+	vertical-align: middle;
+}

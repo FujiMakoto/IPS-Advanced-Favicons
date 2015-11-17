@@ -148,6 +148,13 @@ class _Favicon extends \IPS\Patterns\ActiveRecord
 		$this->_data['file'] = (string) $file;
 		$this->_file = NULL;
 
+		if ( $file->filename == 'favicon.ico' )
+		{
+			$this->width  = '48';
+			$this->height = '48';
+			return;
+		}
+
 		try
 		{
 			$image = \IPS\Image::create( $file->contents() );
