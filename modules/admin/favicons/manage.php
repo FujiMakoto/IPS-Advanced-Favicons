@@ -32,7 +32,7 @@ class _manage extends \IPS\Dispatcher\Controller
 	 */
 	public function execute()
 	{
-		\IPS\Dispatcher::i()->checkAcpPermission( 'manage_manage' );
+		\IPS\Dispatcher::i()->checkAcpPermission( 'favicons_manage' );
 		parent::execute();
 	}
 	
@@ -109,7 +109,7 @@ class _manage extends \IPS\Dispatcher\Controller
 					]
 			);
 		}
-		if ( Member::loggedIn()->hasAcpRestriction( 'favicons', 'favicons', 'settings_manage' ) )
+		if ( Member::loggedIn()->hasAcpRestriction( 'favicons', 'favicons', 'favicons_manage_settings' ) )
 		{
 			$class = Settings::i()->favicons_setUpComplete ? '' : 'ipsButton_disabled';
 			$rootButtons['settings'] = array(
@@ -138,6 +138,8 @@ class _manage extends \IPS\Dispatcher\Controller
 	 */
 	public function wizard()
 	{
+		\IPS\Dispatcher::i()->checkAcpPermission( 'favicons_create' );
+
 		$initialData = [];
 		try
 		{
@@ -158,12 +160,6 @@ class _manage extends \IPS\Dispatcher\Controller
 		/**
 		 * Output
 		 */
-//		if ( \IPS\Request::i()->isAjax() and \IPS\Request::i()->ajaxValidate )
-//		{
-//			\IPS\Output::i()->json( array( 'validate' => true ) );
-//			return;
-//		}
-
 		Output::i()->output = $wizard;
 	}
 
@@ -450,6 +446,8 @@ class _manage extends \IPS\Dispatcher\Controller
 	 */
 	public function settings()
 	{
+		\IPS\Dispatcher::i()->checkAcpPermission( 'favicons_manage_settings' );
+
 		$s = Settings::i();
 		if ( !$s->favicons_setUpComplete )
 		{

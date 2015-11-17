@@ -5,6 +5,11 @@ $lang = array(
 
 	'menu__favicons_favicons'   => 'Favicons',
 
+	# Admin Permissions
+	'r__favicons_manage'            => 'Manage Favicons',
+	'r__favicons_manage_settings'   => 'Manage favicon settings',
+	'r__favicons_create'            => 'Create / generate new favicon sets',
+
 	/**
 	 * [Admin] Settings
 	 */

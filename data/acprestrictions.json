@@ -1,7 +1,8 @@
 {
     "favicons": {
-        "manage": {
-            "manage_manage": "manage_manage"
+        "favicons_manage": {
+            "favicons_manage_settings": "favicons_manage_settings",
+            "favicons_create": "favicons_create"
         }
     }
 }
