@@ -16,6 +16,10 @@
         "default": "0"
     },
     {
+        "key": "favicons_iosFancy",
+        "default": ""
+    },
+    {
         "key": "favicons_msTileColor",
         "default": "#2d89ef"
     },

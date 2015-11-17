@@ -62,7 +62,7 @@ class _manage extends \IPS\Dispatcher\Controller
 			$rootButtons[ 'wizard' ] = array(
 					'icon'  => 'magic',
 					'title' => 'favicons_wizard_run',
-					'link'  => \IPS\Http\Url::internal( 'app=favicons&module=favicons&controller=manage&do=wizard' ),
+					'link'  => \IPS\Http\Url::internal( 'app=favicons&module=favicons&controller=manage&do=wizard&_new=1' ),
 					'data'  => array(
 							'ipsDialog'                 => '',
 							'ipsDialog-title'           => \IPS\Member::loggedIn()->language()->addToStack(
@@ -88,7 +88,7 @@ class _manage extends \IPS\Dispatcher\Controller
 		$initialData = [];
 		try
 		{
-			$initialData['favicons_master'] = Favicon::master();
+			$initialData['favicons_master'] = Favicon::baseImage();
 		}
 		catch ( \UnderflowException $e ) {}
 
@@ -99,7 +99,7 @@ class _manage extends \IPS\Dispatcher\Controller
 				'favicons_ios'      => array( $this, '_stepIOS' ),
 				'favicons_safari'   => array( $this, '_stepSafari' ),
 				'favicons_windows'  => array( $this, '_stepWindows' ),
-				'favicons_review'   => array( $this, '_stepRview' ),
+				'favicons_review'   => array( $this, '_stepReview' ),
 		), \IPS\Http\Url::internal( 'app=favicons&module=favicons&controller=manage&do=wizard' ), TRUE, $initialData );
 
 		/**
@@ -123,7 +123,7 @@ class _manage extends \IPS\Dispatcher\Controller
 	public function _stepMaster( $data )
 	{
 		$form = new Form( 'master', 'continue', \IPS\Http\Url::internal( 'app=favicons&module=favicons&controller=manage&do=wizard&_step=favicons_master' ) );
-		//$form->ajaxOutput = TRUE;
+		$form->ajaxOutput = TRUE;
 		$form->class = 'ipsForm_vertical';
 
 		$default = ( !empty($data['favicons_master']) ) ? $data['favicons_master'] : NULL;
@@ -145,15 +145,17 @@ class _manage extends \IPS\Dispatcher\Controller
 
 				Favicon::reset();
 
-				$master = \IPS\File::create( 'favicons_Favicons', 'master.' . $ext, $contents, 'favicons', FALSE, NULL, FALSE );
+				$master = \IPS\File::create( 'favicons_Favicons', 'base.' . $ext, $contents, 'favicons', FALSE, NULL, FALSE );
 				$master->save();
 				$values['favicons_master'] = $master;
 
 				$favicon = new Favicon();
-				$favicon->type = Favicon::MASTER;
+				$favicon->type = Favicon::BASE;
 				$favicon->name = $master->filename;
 				$favicon->file = $master;
 				$favicon->save();
+
+				Favicon::generateIcons();
 			}
 
 			return $values;
@@ -171,7 +173,7 @@ class _manage extends \IPS\Dispatcher\Controller
 	public function _stepAndroid( $data )
 	{
 		$form = new Form( 'android', 'continue', \IPS\Http\Url::internal( 'app=favicons&module=favicons&controller=manage&do=wizard&_step=favicons_android' ) );
-		//$form->ajaxOutput = TRUE;
+		$form->ajaxOutput = TRUE;
 		$form->class = 'ipsForm_vertical';
 
 		$s = \IPS\Settings::i();
@@ -225,7 +227,7 @@ class _manage extends \IPS\Dispatcher\Controller
 	public function _stepIOS( $data )
 	{
 		$form = new Form( 'ios', 'continue', \IPS\Http\Url::internal( 'app=favicons&module=favicons&controller=manage&do=wizard&_step=favicons_ios' ) );
-		//$form->ajaxOutput = TRUE;
+		$form->ajaxOutput = TRUE;
 		$form->class = 'ipsForm_vertical';
 
 		$form->add( new Form\YesNo( 'favicons_iosFancy', TRUE ) );
@@ -234,6 +236,7 @@ class _manage extends \IPS\Dispatcher\Controller
 		{
 			if ( !isset( \IPS\Request::i()->ajaxValidate ) )
 			{
+				$form->saveAsSettings( $values );
 				Favicon::generateIcons( Favicon::IOS );
 			}
 
@@ -252,7 +255,7 @@ class _manage extends \IPS\Dispatcher\Controller
 	public function _stepSafari( $data )
 	{
 		$form = new Form( 'safari', 'continue', \IPS\Http\Url::internal( 'app=favicons&module=favicons&controller=manage&do=wizard&_step=favicons_safari' ) );
-		//$form->ajaxOutput = TRUE;
+		$form->ajaxOutput = TRUE;
 		$form->class = 'ipsForm_vertical';
 
 		$form->add( new Form\Upload( 'favicons_safariSvg', NULL, FALSE,
@@ -297,6 +300,7 @@ class _manage extends \IPS\Dispatcher\Controller
 	public function _stepWindows( $data )
 	{
 		$form = new Form( 'windows', 'continue', \IPS\Http\Url::internal( 'app=favicons&module=favicons&controller=manage&do=wizard&_step=favicons_windows' ) );
+		$form->ajaxOutput = TRUE;
 		$form->class = 'ipsForm_vertical';
 
 		# Tile color
@@ -321,6 +325,53 @@ class _manage extends \IPS\Dispatcher\Controller
 		) );
 		$form->add( new Form\Color( 'favicons_msTileColor_custom' ) );
 
+		if ( $values = $form->values() )
+		{
+			if ( !isset( \IPS\Request::i()->ajaxValidate ) )
+			{
+				$form->saveAsSettings( $values );
+				Favicon::generateIcons( Favicon::WINDOWS );
+
+				/**
+				 * Create the browserconfig.xml file
+				 *
+				 * For some reason, it seems we have to manually check for our XML configuration file, though we don't seem
+				 * to have to do this for the manifest.json file (and I have no idea why at the moment)
+				 */
+				try
+				{
+					$oldFile = \IPS\File::get( 'favicons_Favicons', 'favicons/browserconfig.xml' );
+					$oldFile->delete();
+				} catch ( \Exception $e ) {}
+
+				\IPS\File::create( 'favicons_Favicons', 'browserconfig.xml', Favicon::microsoftBrowserConfig(), 'favicons', FALSE, NULL, FALSE );
+			}
+
+			return $values;
+		}
+
 		return \IPS\Theme::i()->getTemplate( 'wizard' )->step4( $form );
+	}
+
+
+	/**
+	 * Wizard step: Safari images
+	 *
+	 * @param	array	$data	The current wizard data
+	 * @return	string|array
+	 */
+	public function _stepReview( $data )
+	{
+		$rfgTestUrl = \IPS\Http\Url::external( 'http://realfavicongenerator.net/favicon_checker' )->setQueryString( 'site', \IPS\Http\Url::baseUrl() )->makeSafeForAcp();
+
+		$form = new Form( 'review', 'Complete setup' );
+		$form->ajaxOutput = TRUE;
+		$form->hiddenValues['finished'] = TRUE;
+		if ( $values = $form->values() )
+		{
+			\IPS\Output::i()->redirect( \IPS\Http\Url::internal( 'app=favicons&module=favicons&controller=manage' ) );
+		}
+
+		return \IPS\Theme::i()->getTemplate( 'wizard' )->step5( $form, $rfgTestUrl );
 	}
 }

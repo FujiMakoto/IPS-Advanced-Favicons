@@ -1,6 +1,7 @@
 <?php
 
 namespace IPS\favicons;
+\IPS\IPS::$PSR0Namespaces['PHP_ICO'] = \IPS\ROOT_PATH . '/applications/favicons/sources/3rd_party/PHP_ICO';
 
 use IPS\Db;
 use IPS\File;
@@ -10,6 +11,7 @@ class _Favicon extends \IPS\Patterns\ActiveRecord
 	/**
 	 * Favicon types
 	 */
+	const BASE      = 0;
 	const ANDROID   = 1;
 	const IOS       = 2;
 	const SAFARI    = 3;
@@ -17,15 +19,29 @@ class _Favicon extends \IPS\Patterns\ActiveRecord
 	const MASTER    = 9;
 
 	/**
+	 * @brief   Standard favicon sizes
+	 */
+	public static $masterSizes = [
+		[16, 16],
+		[32, 32],
+		[96, 96]
+	];
+
+	/**
+	 * @brief   Standard filename template
+	 */
+	public static $masterNameTemplate = 'favicon-%d-%d.%s';
+	
+	/**
 	 * @brief   Android favicon sizes
 	 */
 	public static $androidSizes = [
-		['36', '36'],
-		['48', '48'],
-		['72', '72'],
-		['96', '96'],
-		['144', '144'],
-		['192', '192'],
+		[36, 36],
+		[48, 48],
+		[72, 72],
+		[96, 96],
+		[144, 144],
+		[192, 192],
 	];
 
 	/**
@@ -37,20 +53,33 @@ class _Favicon extends \IPS\Patterns\ActiveRecord
 	 * @brief   Apple favicon sizes
 	 */
 	public static $appleSizes = [
-		['57', '57'],
-		['60', '60'],
-		['72', '72'],
-		['76', '76'],
-		['120', '120'],
-		['144', '144'],
-		['152', '152'],
-		['180', '180'],
+		[57, 57],
+		[60, 60],
+		[72, 72],
+		[76, 76],
+		[120, 120],
+		[144, 144],
+		[152, 152],
+		[180, 180],
 	];
 
 	/**
 	 * @brief   Apple filename template
 	 */
 	public static $appleNameTemplate = 'apple-touch-icon-%d-%d.%s';
+
+	/**
+	 * @brief   Apple favicon sizes
+	 */
+	public static $windowsSizes = [
+			[70, 70],
+			[144, 144]
+	];
+
+	/**
+	 * @brief   Apple filename template
+	 */
+	public static $windowsNameTemplate = 'mstile-%d-%d.%s';
 
 	/**
 	 * @brief   Database Table
@@ -98,9 +127,13 @@ class _Favicon extends \IPS\Patterns\ActiveRecord
 		$this->_data['file'] = (string) $file;
 		$this->_file = NULL;
 
-		$image = \IPS\Image::create( $file->contents() );
-		$this->width  = $image->width;
-		$this->height = $image->height;
+		try
+		{
+			$image = \IPS\Image::create( $file->contents() );
+			$this->width  = $image->width;
+			$this->height = $image->height;
+		}
+		catch ( \InvalidArgumentException $e ) {}
 	}
 
 	/**
@@ -136,9 +169,9 @@ class _Favicon extends \IPS\Patterns\ActiveRecord
 	 *
 	 * @return  \IPS\File
 	 */
-	public static function master()
+	public static function baseImage()
 	{
-		$file = Db::i()->select( 'file', static::$databaseTable, [ 'type=?', static::MASTER ], 'id DESC' )->first();
+		$file = Db::i()->select( 'file', static::$databaseTable, [ 'type=?', static::BASE ], 'id DESC' )->first();
 		return \IPS\File::get( 'favicons_Favicons', $file );
 	}
 
@@ -193,7 +226,7 @@ class _Favicon extends \IPS\Patterns\ActiveRecord
 		$nameTemplate = "{$type}NameTemplate";
 
 		/* Can we support our master images filetype? */
-		$master = static::master();
+		$master = static::baseImage();
 		switch ( File::getMimeType( (string) $master ) )
 		{
 			case 'image/x-icon':
@@ -230,6 +263,28 @@ class _Favicon extends \IPS\Patterns\ActiveRecord
 			$record->save();
 		}
 
+		/* Standard specific patch-in */
+		if ( $for === static::MASTER )
+		{
+			$image = \IPS\Image::create( $master->contents() );
+			$image->resize( 48, 48 );
+
+			$ico = new \PHP_ICO\PHP_ICO();
+			$ico->PHP_ICO();
+			$ico->add_image( (string) $image );
+
+			$file = File::create( 'favicons_Favicons', 'favicon.ico', $ico->get_ico(), 'favicons', FALSE, NULL, FALSE );
+
+			/* Save the new favicon record */
+			$record = new Favicon();
+
+			$record->type = Favicon::MASTER;
+			$record->name = $file->filename;
+			$record->file = $file;
+
+			$record->save();
+		}
+
 		/* Apple specific patch-in */
 		if ( $for === static::IOS )
 		{
@@ -244,7 +299,7 @@ class _Favicon extends \IPS\Patterns\ActiveRecord
 				/* Save the new favicon record */
 				$record = new Favicon();
 
-				$record->type = Favicon::ANDROID;
+				$record->type = Favicon::IOS;
 				$record->name = $file->filename;
 				$record->file = $file;
 
@@ -254,7 +309,7 @@ class _Favicon extends \IPS\Patterns\ActiveRecord
 	}
 
 	/**
-	 * Generate android manifest.json data
+	 * Generate Android manifest.json data
 	 *
 	 * @param   bool|TRUE   $json   Return output in json encoded format
 	 * @return  array|string
@@ -298,6 +353,31 @@ class _Favicon extends \IPS\Patterns\ActiveRecord
 		}
 
 		return $json ? json_encode( $manifest ) : $manifest;
+	}
+
+	/**
+	 * Generate Microsoft browserconfig.xml data
+	 *
+	 * @return  string
+	 */
+	public static function microsoftBrowserConfig()
+	{
+		$s = \IPS\Settings::i();
+
+		$xml = new \SimpleXMLElement( '<xml/>' );
+		$browserConfig = $xml->addChild( 'browserconfig' );
+		$msApplication = $browserConfig->addChild( 'msapplication' );
+		$tile = $msApplication->addChild( 'tile' );
+
+		$favicons = static::favicons( static::WINDOWS );
+		foreach ( $favicons as $favicon )
+		{
+			$item = $tile->addChild( "square{$favicon->sizes}logo" );
+			$item->addAttribute( 'src', (string) $favicon->file->url );
+		}
+
+		$tile->addChild( 'TileColor', $s->favicons_msTileColor );
+		return $xml->asXML();
 	}
 
 	/**

@@ -97,7 +97,12 @@ This is optional and can be skipped if you do not have a SVG image to use. Safar
 	'favicons_windows_hDesc'    => 'Windows 8 users can pin your website on their desktop. Your site appears as a tile, just like a native Windows 8 app.',
 
 	# Step 6 - Review
-	'favicons_review'   => 'Complete',
+	'favicons_review'       => 'Complete',
+	'favicons_reviewHeader' => 'All favicons generated successfully!',
+	'favicons_review_hDesc' => 'That\'s it! Your website should now have favicons that are compliant with all devices. Want to test it out? Follow the link below!',
+
+	'favicons_reviewCheck'  => 'Check favicons',
+	'favicons_reviewFinish' => 'Complete setup',
 
 	# Filters
 	'favicons_filter_android'   => 'Android',
