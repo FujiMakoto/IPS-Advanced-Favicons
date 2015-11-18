@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<theme name="Default" author_name="Invision Power Services, Inc" author_url="http://www.invisionpower.com">
+ <template template_group="manage" template_name="faviconPreview" template_data="$imageUrl, $imageAlt='preview'" template_location="admin" template_app="favicons"><![CDATA[<div class="ipsImage ipsImage_thumbnailed faviconsPreviewImage">
+	<img src="{$imageUrl}" alt="{$imageAlt}">
+</div>]]></template>
+ <template template_group="wizard" template_name="photoCrop" template_data="$name, $value, $photo" template_location="admin" template_app="favicons"><![CDATA[
+<div data-controller='core.front.profile.cropper' id='elPhotoCropper' class='ipsAreaBackground_light ipsType_center ipsPad'>
+	<h3 class='ipsType_sectionHead'>{lang="photo_crop_title"}</h3>
+	<p class='ipsType_light ipsType_reset'>{lang="photo_crop_instructions"}</p>
+	<br>
+
+	<div data-role='cropper'>
+		<img src="{$photo}" data-role='profilePhoto'>
+	</div>
+
+	<input type='hidden' name='{$name}[0]' value='{$value[0]}' data-role='topLeftX'>
+	<input type='hidden' name='{$name}[1]' value='{$value[1]}' data-role='topLeftY'>
+	<input type='hidden' name='{$name}[2]' value='{$value[2]}' data-role='bottomRightX'>
+	<input type='hidden' name='{$name}[3]' value='{$value[3]}' data-role='bottomRightY'>
+</div>]]></template>
+ <template template_group="wizard" template_name="step1" template_data="$form" template_location="admin" template_app="favicons"><![CDATA[<div class="ipsContained ipsPad_top">
+	<div class="ipsType_center">
+		<h1>{lang="favicons_master"}</h1>
+		<h4>{lang="favicons_master_hDesc"}</h4>
+	</div>
+
+	{$form|raw}
+</div>]]></template>
+ <template template_group="wizard" template_name="step2" template_data="$form" template_location="admin" template_app="favicons"><![CDATA[<div class="ipsContained ipsPad_top">
+	<div class="ipsType_center">
+		<h1>{lang="favicons_androidHeader"}</h1>
+		<h4>{lang="favicons_android_hDesc"}</h4>
+	</div>
+
+	{$form|raw}
+</div>]]></template>
+ <template template_group="wizard" template_name="step3" template_data="$form" template_location="admin" template_app="favicons"><![CDATA[<div class="ipsContained ipsPad_top">
+	<div class="ipsType_center">
+		<h1>{lang="favicons_iosHeader"}</h1>
+		<h4>{lang="favicons_ios_hDesc"}</h4>
+	</div>
+
+	{$form|raw}
+</div>]]></template>
+ <template template_group="wizard" template_name="step4" template_data="$form" template_location="admin" template_app="favicons"><![CDATA[<div class="ipsContained ipsPad_top">
+	<div class="ipsType_center">
+		<h1>{lang="favicons_safariHeader"}</h1>
+		<h4>{lang="favicons_safari_hDesc"}</h4>
+	</div>
+
+	{$form|raw}
+</div>]]></template>
+ <template template_group="wizard" template_name="step5" template_data="$form" template_location="admin" template_app="favicons"><![CDATA[<div class="ipsContained ipsPad_top">
+	<div class="ipsType_center">
+		<h1>{lang="favicons_windowsHeader"}</h1>
+		<h4>{lang="favicons_windows_hDesc"}</h4>
+	</div>
+
+	{$form|raw}
+</div>]]></template>
+ <template template_group="wizard" template_name="step6" template_data="$rfgTestUrl" template_location="admin" template_app="favicons"><![CDATA[<div class="ipsContained ipsPad_top">
+	<div class="ipsType_center">
+		<h1>{lang="favicons_reviewHeader"}</h1>
+		<h4>{lang="favicons_review_hDesc"}</h4>
+		<!--<p>That's it! Your website should now have favicons that are compliant with all devices. Want to test it out? Follow the link below!</p>-->
+		<div class="ipsPad_double">
+			<ul class="ipsList_inline">
+				<li>
+					<a class="ipsButton ipsButton_primary" href="{$rfgTestUrl}" target="_blank">
+						{lang="favicons_reviewCheck"}
+					</a>
+				</li>
+
+				<li>
+					<a class="ipsButton ipsButton_primary" href="{url="app=favicons&module=favicons&controller=manage"}">
+						{lang="favicons_reviewFinish"}
+					</a>
+				</li>
+			</ul>
+		</div>
+	</div>
+</div>]]></template>
+ <css css_location="admin" css_app="favicons" css_attributes="" css_path="." css_name="favicons.css"><![CDATA[.faviconsPreviewImage {
+	width: 72px;
+	height: 72px;
+	line-height: 65px;
+	text-align: center;
+}
+
+.faviconsPreviewImage > img {
+	max-width: inherit;
+	max-height: 70px;
+	vertical-align: middle;
+}]]></css>
+</theme>

@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<language>
+ <app key="favicons" version="100000">
+  <word key="__app_favicons" js="0">Advanced Favicons</word>
+  <word key="menu__favicons_favicons" js="0">Favicons</word>
+  <word key="r__favicons_manage" js="0">Manage Favicons</word>
+  <word key="r__favicons_manage_settings" js="0">Manage favicon settings</word>
+  <word key="r__favicons_create" js="0">Create / generate new favicon sets</word>
+  <word key="favicons_androidTab" js="0">Android</word>
+  <word key="favicons_androidHeader" js="0">Android Chrome</word>
+  <word key="favicons_androidAppName" js="0">App name</word>
+  <word key="favicons_androidAppShortName" js="0">App short name</word>
+  <word key="favicons_androidAppShortName_desc" js="0">Optional. The short name is preferred over name and if provided will be used.</word>
+  <word key="favicons_androidColor" js="0">Theme color</word>
+  <word key="favicons_androidColor_desc" js="0">Starting with Android Lollipop, you can customize the color of the task bar in the switcher.</word>
+  <word key="favicons_androidStandalone" js="0">Enable standalone mode?</word>
+  <word key="favicons_androidStandalone_desc" js="0"><![CDATA[In this mode, Android Chrome gives a little more "native" style to the opened page.<br>
+In particular, it lets you enforce the start URL and screen orientation. It also removes the navigation bar and gives your web site its own tab in the task switcher.]]></word>
+  <word key="favicons_androidStandalone_startUrl" js="0">Custom start URL</word>
+  <word key="favicons_androidStandalone_startUrl_desc" js="0">Optional. Use this field to override the URL of the bookmarked page.</word>
+  <word key="favicons_androidStandalone_orientation" js="0">Device orientation</word>
+  <word key="favicons_androidStandalone_orientation_desc" js="0">Optional. Forces screen orientation to either portrait or landscape.</word>
+  <word key="favicons_androidStandalone_orientation_default" js="0">Not specified (Recommended)</word>
+  <word key="favicons_androidStandalone_orientation_portrait" js="0">Portrait</word>
+  <word key="favicons_androidStandalone_orientation_landscape" js="0">Landscape</word>
+  <word key="favicons_iosTab" js="0">Apple iOS</word>
+  <word key="favicons_iosHeader" js="0">iOS - Web Clip</word>
+  <word key="favicons_msTab" js="0">Microsoft</word>
+  <word key="favicons_msHeader" js="0">Windows 8 and 10</word>
+  <word key="favicons_msTileColor" js="0">Tile background color</word>
+  <word key="favicons_msTileColor_desc" js="0"><![CDATA[Preferably, choose one of the above <a href='https://colorlib.com/etc/metro-colors/' target='_blank'>suggested colors for the Windows Metro UI</a>.]]></word>
+  <word key="favicons_msTileColor_blue" js="0">Blue</word>
+  <word key="favicons_msTileColor_darkBlue" js="0">Dark Blue</word>
+  <word key="favicons_msTileColor_teal" js="0">Teal</word>
+  <word key="favicons_msTileColor_lightPurple" js="0">Light Purple</word>
+  <word key="favicons_msTileColor_darkPurple" js="0">Dark Purple</word>
+  <word key="favicons_msTileColor_darkRed" js="0">Dark Red</word>
+  <word key="favicons_msTileColor_darkOrange" js="0">Dark Orange</word>
+  <word key="favicons_msTileColor_yellow" js="0">Yellow</word>
+  <word key="favicons_msTileColor_green" js="0">Green</word>
+  <word key="favicons_msTileColor_custom" js="0">Custom color</word>
+  <word key="menu__favicons_favicons_manage" js="0">Manage</word>
+  <word key="favicons_manage_title" js="0">Manage Favicons</word>
+  <word key="favicons_wizard_title" js="0">Favicon Generation Wizard</word>
+  <word key="favicons_wizard_run" js="0">Setup Wizard</word>
+  <word key="favicons_reset" js="0">Delete Favicons</word>
+  <word key="favicons_reset_success" js="0">All favicons deleted successfully</word>
+  <word key="favicons_file" js="0">Favicon</word>
+  <word key="favicons_type" js="0">Favicon Type</word>
+  <word key="favicons_settings" js="0">Favicon Settings</word>
+  <word key="favicons_type_0" js="0"><![CDATA[<i class="fa fa-image"></i> &nbsp;Original]]></word>
+  <word key="favicons_type_1" js="0"><![CDATA[<i class="fa fa-android"></i> &nbsp;Android]]></word>
+  <word key="favicons_type_2" js="0"><![CDATA[<i class="fa fa-apple"></i> &nbsp;Apple iOS]]></word>
+  <word key="favicons_type_3" js="0"><![CDATA[<i class="fa fa-safari"></i> &nbsp;Safari]]></word>
+  <word key="favicons_type_4" js="0"><![CDATA[<i class="fa fa-windows"></i> &nbsp;Windows]]></word>
+  <word key="favicons_type_9" js="0"><![CDATA[<i class="fa fa-image"></i> &nbsp;Standard Favicon]]></word>
+  <word key="favicons_master" js="0">Master Image</word>
+  <word key="favicons_master_hDesc" js="0"><![CDATA[This is the base image that will be used to generate all of your sites favicons.<br>
+For best results, this image should be at least 192 x 192px in size.]]></word>
+  <word key="favicons_android" js="0">Android</word>
+  <word key="favicons_android_hDesc" js="0">Android users can mix their natives apps and web bookmarks on the homescreen. Bookmark links looks like just like native apps.</word>
+  <word key="favicons_ios" js="0">iOS</word>
+  <word key="favicons_ios_hDesc" js="0">iOS can automatically add some visual effects to your icon so that it coordinates with the built-in icons on the Home screen (as it does with application icons).</word>
+  <word key="favicons_iosFancy" js="0">Enable fancy effects?</word>
+  <word key="favicons_iosFancy_desc" js="0"><![CDATA[When enabled, the following special effects will be automatically applied to your icon on iOS devices:<br>
+<ul>
+	<li>Rounded corners</li>
+	<li>Drop shadow</li>
+	<li>Reflective shine</li>
+</ul>]]></word>
+  <word key="favicons_safari" js="0">Safari</word>
+  <word key="favicons_safariHeader" js="0">Safari Pinned Tab</word>
+  <word key="favicons_safari_hDesc" js="0"><![CDATA[Safari 9 for Mac OS X El Capitan implements pinned tabs. This feature relies on an SVG icon. This icon must be monochrome and Safari does the rest.<br>
+This is optional and can be skipped if you do not have a SVG image to use. Safari uses the first letter of your domain name to create a default icon in this case.]]></word>
+  <word key="favicons_safariSvg" js="0">Safari SVG image</word>
+  <word key="favicons_windows" js="0">Windows</word>
+  <word key="favicons_windowsHeader" js="0">Windows 8 and 10</word>
+  <word key="favicons_windows_hDesc" js="0">Windows 8 users can pin your website on their desktop. Your site appears as a tile, just like a native Windows 8 app.</word>
+  <word key="favicons_review" js="0">Complete</word>
+  <word key="favicons_reviewHeader" js="0">All favicons generated successfully!</word>
+  <word key="favicons_review_hDesc" js="0">That's it! Your website should now have favicons that are compliant with all devices. Want to test it out? Follow the link below!</word>
+  <word key="favicons_reviewCheck" js="0">Check favicons</word>
+  <word key="favicons_reviewFinish" js="0">Complete setup</word>
+  <word key="favicons_filter_android" js="0">Android</word>
+  <word key="favicons_filter_ios" js="0">iOS</word>
+  <word key="favicons_filter_safari" js="0">Safari</word>
+  <word key="favicons_filter_windows" js="0">Windows</word>
+  <word key="favicons_error_runSetupFirst" js="0">You must complete the Setup Wizard before accessing the Favicon Settings page</word>
+  <word key="favicons_error_noFaviconsToDelete" js="0">You need to create some favicons before you can delete them!</word>
+ </app>
+</language>

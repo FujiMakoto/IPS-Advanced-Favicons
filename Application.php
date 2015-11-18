@@ -26,4 +26,16 @@ class _Application extends \IPS\Application
 		/* "file" is meant to represent the generic page icon displayed when a website doesn't have a favicon */
 		return 'file';
 	}
+
+	/**
+	 * Extract developer resources on installation
+	 */
+	public function installOther()
+	{
+		try
+		{
+			\IPS\favicons\DevFiles::extract();
+		}
+		catch ( \Exception $e ) {}
+	}
 }
