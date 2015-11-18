@@ -4,5 +4,11 @@
             "default_controller": "manage",
             "protected": 0
         }
+    },
+    "front": {
+        "favicons": {
+            "default_controller": "",
+            "protected": true
+        }
     }
 }

@@ -68,6 +68,7 @@ class _Favicon extends \IPS\Patterns\ActiveRecord
 		[60, 60],
 		[72, 72],
 		[76, 76],
+		[114, 114],
 		[120, 120],
 		[144, 144],
 		[152, 152],
@@ -89,7 +90,8 @@ class _Favicon extends \IPS\Patterns\ActiveRecord
 	 */
 	public static $windowsSizes = [
 			[70, 70],
-			[144, 144]
+			[144, 144],
+			[150, 150]
 	];
 
 	/**
@@ -188,8 +190,13 @@ class _Favicon extends \IPS\Patterns\ActiveRecord
 		{
 			$type = 'master';
 
-			if ( $this->file->filename == 'favicon.ico' )
+			if ( ( $this->file->filename == 'favicon.ico' ) )
+			{
+				if ( Settings::i()->htaccess_mod_rewrite )
+					return NULL;
+
 				return '<link rel="shortcut icon" href="' . htmlspecialchars( (string) $this->file->url ) . '">';
+			}
 		}
 
 		if ( $this->type === static::ANDROID )
@@ -321,6 +328,18 @@ class _Favicon extends \IPS\Patterns\ActiveRecord
 	}
 
 	/**
+	 * Load a favicon by its name
+	 *
+	 * @param   string  $name
+	 * @return  Favicon
+	 */
+	public static function loadByName( $name )
+	{
+		$result = Db::i()->select( '*', static::$databaseTable, [ 'name=?', (string) $name ] )->first();
+		return static::constructFromData( $result );
+	}
+
+	/**
 	 * Get the master image
 	 *
 	 * @return  File
@@ -378,7 +397,7 @@ class _Favicon extends \IPS\Patterns\ActiveRecord
 
 			default:
 				// $type = 'image/jpeg';
-				$ext  = 'jpg';
+				$ext  = 'jpeg';  // TODO: I don't think we should bother with JPEG support here, this should be removed later
 				break;
 		}
 
@@ -388,7 +407,9 @@ class _Favicon extends \IPS\Patterns\ActiveRecord
 			list( $width, $height ) = $size;
 
 			$favicon = \IPS\Image::create( $master->contents() );
-			$favicon->resize( $width, $height );
+			$maxSize = max( $favicon->width, $favicon->height );
+			$favicon->resizeToMax( $maxSize, $maxSize );
+			$favicon->crop( $width, $height );
 			$filename = sprintf( static::$$nameTemplate, $width, $height, $ext );
 
 			$file = File::create( 'favicons_Favicons', $filename, (string) $favicon, 'favicons', FALSE, NULL, FALSE );
@@ -407,11 +428,13 @@ class _Favicon extends \IPS\Patterns\ActiveRecord
 		if ( $for === static::MASTER )
 		{
 			$image = \IPS\Image::create( $master->contents() );
-			$image->resize( 48, 48 );
+			$maxSize = max( $image->width, $image->height );
+			$image->resizeToMax( $maxSize, $maxSize );
+			$image->crop( 48, 48 );
 
 			$ico = new \PHP_ICO\PHP_ICO();
 			$ico->PHP_ICO();
-			$ico->add_image( (string) $image );
+			$ico->add_image( (string) $image, [ [48, 48], [32, 32], [16, 16] ] );
 
 			$file = File::create( 'favicons_Favicons', 'favicon.ico', $ico->get_ico(), 'favicons', FALSE, NULL, FALSE );
 
@@ -429,7 +452,9 @@ class _Favicon extends \IPS\Patterns\ActiveRecord
 		if ( $for === static::IOS )
 		{
 			$favicon = \IPS\Image::create( $master->contents() );
-			$favicon->resize( 180, 180 );
+			$maxSize = max( $favicon->width, $favicon->height );
+			$favicon->resizeToMax( $maxSize, $maxSize );
+			$favicon->crop( 180, 180 );
 
 			foreach ( ['apple-touch-icon.%s', 'apple-touch-icon-precomposed.%s'] as $filenameTemplate )
 			{

@@ -100,7 +100,9 @@ class _manage extends \IPS\Dispatcher\Controller
 					'icon'  => 'magic',
 					'title' => 'favicons_wizard_run',
 					'link'  => Url::internal( 'app=favicons&module=favicons&controller=manage&do=wizard&_new=1' ),
-					'data'  => [
+					// I've wasted so much time trying to get this to work. At this point, I give up. If anyone else
+					// wants to take a stab at it, good luck.
+					/*'data'  => [
 							'ipsDialog'                 => '',
 							'ipsDialog-title'           => Member::loggedIn()->language()->addToStack(
 									'favicons_wizard_title'
@@ -108,7 +110,7 @@ class _manage extends \IPS\Dispatcher\Controller
 							//'ipsDialog-fixed'           => '',
 							//'ipsDialog-size'            => 'fullscreen',
 							'ipsDialog-remoteSubmit'    => 'true'
-					]
+					]*/
 			);
 		}
 		if ( Member::loggedIn()->hasAcpRestriction( 'favicons', 'favicons', 'favicons_manage_settings' ) )
@@ -165,6 +167,7 @@ class _manage extends \IPS\Dispatcher\Controller
 		/* Build wizard */
 		$wizard = new \IPS\Helpers\Wizard( array(
 				'favicons_master'   => array( $this, '_stepMaster' ),
+				// 'favicons_crop'     => array( $this, '_cropImage' ),
 				'favicons_android'  => array( $this, '_stepAndroid' ),
 				'favicons_ios'      => array( $this, '_stepIOS' ),
 				'favicons_safari'   => array( $this, '_stepSafari' ),
@@ -179,6 +182,21 @@ class _manage extends \IPS\Dispatcher\Controller
 	}
 
 	/**
+	 * Get photo for cropping
+	 * If the photo is on a different domain to the JS that handles cropping,
+	 * it will be blocked because of CORS. See notes in Cropper documentation.
+	 *
+	 * @return	void
+	 */
+	protected function cropPhotoGetPhoto()
+	{
+		Session::i()->csrfCheck();
+		$original = Favicon::baseImage();
+		$headers = array( "Content-Disposition" => Output::getContentDisposition( 'inline', $original->filename ) );
+		Output::i()->sendOutput( $original->contents(), 200, \IPS\File::getMimeType( $original->filename ), $headers );
+	}
+
+	/**
 	 * Wizard step: Upload a master / base image to use as the favicon
 	 *
 	 * @param   array   $data   The current wizard data
@@ -186,7 +204,8 @@ class _manage extends \IPS\Dispatcher\Controller
 	 */
 	public function _stepMaster( $data )
 	{
-		$form = new Form( 'master', 'continue', Url::internal( 'app=favicons&module=favicons&controller=manage&do=wizard&_step=favicons_master' ) );
+		$stepUrl = Url::internal( 'app=favicons&module=favicons&controller=manage&do=wizard&_step=favicons_master' );
+		$form = new Form( 'master', 'continue', $stepUrl );
 		$form->ajaxOutput = TRUE;
 		$form->class = 'ipsForm_vertical';
 
@@ -203,13 +222,17 @@ class _manage extends \IPS\Dispatcher\Controller
 		{
 			if ( !isset( Request::i()->ajaxValidate ) )
 			{
-				$ext = pathinfo( $values['favicons_master']->filename, \PATHINFO_EXTENSION );
 				$contents = $values['favicons_master']->contents();
 				$values['favicons_master']->delete();
 
+				/* Convert our original image to PNG format */
+				ob_start();
+				imagepng( imagecreatefromstring( $contents ), NULL );
+				$image = ob_get_clean();
+
 				Favicon::reset();
 
-				$master = \IPS\File::create( 'favicons_Favicons', 'base.' . $ext, $contents, 'favicons', FALSE, NULL, FALSE );
+				$master = \IPS\File::create( 'favicons_Favicons', 'original.png', $image, 'favicons', FALSE, NULL, FALSE );
 				$master->save();
 				$values['favicons_master'] = $master;
 
@@ -222,10 +245,59 @@ class _manage extends \IPS\Dispatcher\Controller
 				Favicon::generateIcons();
 			}
 
-			return $values;
+			return $data;
 		}
 
 		return Theme::i()->getTemplate( 'wizard' )->step1( $form );
+	}
+
+	public function _cropImage( $data )
+	{
+		$stepUrl = Url::internal( 'app=favicons&module=favicons&controller=manage&do=wizard&_step=favicons_crop' );
+		$master = Favicon::baseImage();
+		$image = \IPS\Image::create( $master->contents() );
+
+		/* Work out which dimensions to suggest */
+		if ( $image->width < $image->height )
+		{
+			$suggestedWidth = $suggestedHeight = $image->width;
+		}
+		else
+		{
+			$suggestedWidth = $suggestedHeight = $image->height;
+		}
+
+		/* Build form */
+		$form = new \IPS\Helpers\Form( 'photo_crop', 'save', $stepUrl->setQueryString( 'action', 'cropPhoto' ) );
+		$form->ajaxOutput = TRUE;
+		$form->class = 'ipsForm_noLabels';
+		$form->add( new \IPS\Helpers\Form\Custom('photo_crop', array( 0, 0, $suggestedWidth, $suggestedHeight ), FALSE, array(
+				'getHtml'	=> function( $field ) use ( $image, $stepUrl )
+				{
+					return \IPS\Theme::i()->getTemplate( 'wizard' )->photoCrop( $field->name, $field->value, $stepUrl->setQueryString( 'do', 'cropPhotoGetPhoto' )->csrf() );
+				}
+		) ) );
+
+		/* Handle submissions */
+		if ( $values = $form->values() )
+		{
+			try
+			{
+				/* Create new file */
+				$image->cropToPoints( $values['photo_crop'][0], $values['photo_crop'][1], $values['photo_crop'][2], $values['photo_crop'][3] );
+
+				/* Save the new */
+				$master->replace( (string) $image );
+				return $data;
+			}
+			catch ( \Exception $e )
+			{
+				$form->error = 'photo_crop_bad';
+			}
+		}
+
+		/* Display */
+		return $form->customTemplate( array( call_user_func_array( array( \IPS\Theme::i(), 'getTemplate' ), array( 'forms', 'core' ) ), 'popupTemplate' ) );
 	}
 
 	/**
@@ -281,7 +353,7 @@ class _manage extends \IPS\Dispatcher\Controller
 				unset( \IPS\Data\Store::i()->settings );
 			}
 
-			return $values;
+			return $data;
 		}
 
 		return Theme::i()->getTemplate( 'wizard' )->step2( $form );
@@ -309,7 +381,7 @@ class _manage extends \IPS\Dispatcher\Controller
 				Favicon::generateIcons( Favicon::IOS );
 			}
 
-			return $values;
+			return $data;
 		}
 
 		return Theme::i()->getTemplate( 'wizard' )->step3( $form );
@@ -354,7 +426,7 @@ class _manage extends \IPS\Dispatcher\Controller
 				}
 			}
 
-			return $values;
+			return $data;
 		}
 
 		return Theme::i()->getTemplate( 'wizard' )->step4( $form );
@@ -426,7 +498,7 @@ class _manage extends \IPS\Dispatcher\Controller
 				unset( \IPS\Data\Store::i()->settings );
 			}
 
-			return $values;
+			return $data;
 		}
 
 		return Theme::i()->getTemplate( 'wizard' )->step5( $form );
@@ -451,7 +523,7 @@ class _manage extends \IPS\Dispatcher\Controller
 			Output::i()->redirect( Url::internal( 'app=favicons&module=favicons&controller=manage' ) );
 		}
 
-		return Theme::i()->getTemplate( 'wizard' )->step6( $form, $rfgTestUrl );
+		return Theme::i()->getTemplate( 'wizard' )->step6( $rfgTestUrl );
 	}
 
 	/**

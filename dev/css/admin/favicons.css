@@ -7,6 +7,6 @@
 
 .faviconsPreviewImage > img {
 	max-width: inherit;
-	max-height: inherit;
+	max-height: 70px;
 	vertical-align: middle;
 }
