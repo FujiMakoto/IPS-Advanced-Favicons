@@ -614,6 +614,28 @@ class _Favicon extends \IPS\Patterns\ActiveRecord
 	}
 
 	/**
+	 * Generate a random string for use with anti-cache keys
+	 *
+	 * @param   int     $length Anti-cache key length. Defaults to 10.
+	 * @param   bool    $update Automatically update the anti-cache key setting. Defaults to True.
+	 * @return  string
+	 */
+	public static function generateAntiCacheKey( $length=10, $update=TRUE )
+	{
+		$key = bin2hex( openssl_random_pseudo_bytes($length * 2) );
+
+		/* Update the setting value */
+		if ( $update )
+		{
+			Settings::i()->favicons_antiCacheKey = $key;
+			Db::i()->update( 'core_sys_conf_settings', array( 'conf_value' => $key ), array( 'conf_key=?', 'favicons_antiCacheKey' ) );
+			unset( \IPS\Data\Store::i()->settings );
+		}
+
+		return $key;
+	}
+
+	/**
 	 * [ActiveRecord] Delete Record
 	 *
 	 * @return	void
