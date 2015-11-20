@@ -83,9 +83,9 @@ class _router extends \IPS\Dispatcher\Controller
 				}
 			}
 
-			if ( isset( $urls["favicon-{$width}-{$height}.png"] ) )
+			if ( isset( $urls["favicon-{$width}x{$height}.png"] ) )
 			{
-				Output::i()->redirect( Url::external( $urls["favicon-{$width}-{$height}.png"] ) );
+				Output::i()->redirect( Url::external( $urls["favicon-{$width}x{$height}.png"] ) );
 				return;
 			}
 			else
@@ -118,13 +118,13 @@ class _router extends \IPS\Dispatcher\Controller
 				}
 			}
 
-			if ( isset( $urls["apple-touch-icon-{$width}-{$height}.png"] ) )
+			if ( isset( $urls["apple-touch-icon-{$width}x{$height}.png"] ) )
 			{
-				/*$favicon = Favicon::loadByName( "apple-touch-icon-{$width}-{$height}.png" );
+				/*$favicon = Favicon::loadByName( "apple-touch-icon-{$width}x{$height}.png" );
 				Output::i()->sendOutput( $favicon->file->contents(), 200, 'image/png' );
 				return;*/
 
-				Output::i()->redirect( Url::external( $urls["apple-touch-icon-{$width}-{$height}.png"] ) );
+				Output::i()->redirect( Url::external( $urls["apple-touch-icon-{$width}x{$height}.png"] ) );
 				return;
 			}
 			else
@@ -152,6 +152,41 @@ class _router extends \IPS\Dispatcher\Controller
 			}
 		}
 
-		Output::i()->error( 'node_error', '2FAVI203/7' );
+		/**
+		 * Android
+		 */
+		if ( $type == 'android' )
+		{
+			if ( isset( $urls["android-chrome-{$width}x{$height}.png"] ) )
+			{
+				Output::i()->redirect( Url::external( $urls["android-chrome-{$width}x{$height}.png"] ) );
+				return;
+			}
+			else
+			{
+				Output::i()->error( 'node_error', '2FAVI203/7' );
+				return;
+			}
+		}
+
+		/**
+		 * Windows
+		 */
+		if ( $type == 'windows' )
+		{
+			if ( isset( $urls["mstile-{$width}x{$height}.png"] ) )
+			{
+				Output::i()->redirect( Url::external( $urls["mstile-{$width}x{$height}.png"] ) );
+				return;
+			}
+			else
+			{
+				Output::i()->error( 'node_error', '2FAVI203/8' );
+				return;
+			}
+		}
+
+
+		Output::i()->error( 'node_error', '2FAVI203/9' );
 	}
 }

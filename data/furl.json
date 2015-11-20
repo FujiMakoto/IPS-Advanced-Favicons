@@ -29,7 +29,7 @@
       "real": "app=favicons&module=favicons&controller=router&type=master"
     },
     "favicons_apple_full": {
-      "friendly": "apple-touch-icon-{#width}-{#height}.png",
+      "friendly": "apple-touch-icon-{#width}x{#height}.png",
       "real": "app=favicons&module=favicons&controller=router&type=apple"
     },
     "favicons_apple_precomposed": {
@@ -39,6 +39,14 @@
     "favicons_apple": {
       "friendly": "apple-touch-icon.png",
       "real": "app=favicons&module=favicons&controller=router&type=apple"
+    },
+    "favicons_android_full": {
+      "friendly": "android-chrome-{#width}x{#height}.png",
+      "real": "app=favicons&module=favicons&controller=router&type=android"
+    },
+    "favicons_microsoft_full": {
+      "friendly": "mstile-{#width}x{#height}.png",
+      "real": "app=favicons&module=favicons&controller=router&type=microsoft"
     }
   }
 }
