@@ -222,13 +222,16 @@ class _manage extends \IPS\Dispatcher\Controller
 		{
 			if ( !isset( Request::i()->ajaxValidate ) )
 			{
-				$contents = $values['favicons_master']->contents();
+				$image = $values['favicons_master']->contents();
 				$values['favicons_master']->delete();
 
 				/* Convert our original image to PNG format */
-				ob_start();
-				imagepng( imagecreatefromstring( $contents ), NULL );
-				$image = ob_get_clean();
+				if ( pathinfo( $values['favicons_master']->filename, \PATHINFO_EXTENSION ) != 'png' )
+				{
+					ob_start();
+					imagepng( imagecreatefromstring( $image ), NULL );
+					$image = ob_get_clean();
+				}
 
 				Favicon::reset();
 

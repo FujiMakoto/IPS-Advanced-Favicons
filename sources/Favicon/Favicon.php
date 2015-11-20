@@ -89,9 +89,7 @@ class _Favicon extends \IPS\Patterns\ActiveRecord
 	 * @brief   Windows favicon sizes
 	 */
 	public static $windowsSizes = [
-			[70, 70],
-			[144, 144],
-			[150, 150]
+			[144, 144]
 	];
 
 	/**
@@ -231,12 +229,12 @@ class _Favicon extends \IPS\Patterns\ActiveRecord
 	}
 
 	/**
-	 * Internal method for retrieving a favicon files URL with an anti-cache key appended to it
+	 * Retrieve the favicon files URL with an anti-cache key appended to it
 	 *
 	 * @param   \IPS\File   $file
 	 * @return  string
 	 */
-	protected function getFileUrl( $file )
+	public function getFileUrl( $file )
 	{
 		$antiCacheKey = Settings::i()->favicons_antiCacheKey;
 		return (string) $file->url->setQueryString( 'v', $antiCacheKey );
@@ -420,8 +418,10 @@ class _Favicon extends \IPS\Patterns\ActiveRecord
 
 			$favicon = \IPS\Image::create( $master->contents() );
 			$maxSize = max( $favicon->width, $favicon->height );
+			// TODO: We should handle this better, this can result in broken transparency
 			$favicon->resizeToMax( $maxSize, $maxSize );
 			$favicon->crop( $width, $height );
+
 			$filename = sprintf( static::$$nameTemplate, $width, $height, $ext );
 
 			$file = File::create( 'favicons_Favicons', $filename, (string) $favicon, 'favicons', FALSE, NULL, FALSE );
@@ -477,6 +477,72 @@ class _Favicon extends \IPS\Patterns\ActiveRecord
 				$record = new Favicon();
 
 				$record->type = Favicon::IOS;
+				$record->name = $file->filename;
+				$record->file = $file;
+
+				$record->save();
+			}
+		}
+
+		/* Microsoft specific patch-ins */
+		if ( $for === static::WINDOWS )
+		{
+			$sizes = [
+				[
+					'canvas'    => ['w' => '270', 'h' => 270],
+					'size'      => ['w' => '135', 'h' => 135],
+					'offset'    => ['x' => '-67', 'y' => '-45']
+				],
+				[
+					'canvas'    => ['w' => '558', 'h' => 270],
+					'size'      => ['w' => '126', 'h' => 126],
+					'offset'    => ['x' => '-216', 'y' => '-50']
+				],
+				[
+					'canvas'    => ['w' => '558', 'h' => 558],
+					'size'      => ['w' => '259', 'h' => 259],
+					'offset'    => ['x' => '-149', 'y' => '-128']
+				],
+				[
+					'canvas'    => ['w' => '128', 'h' => 128],
+					'size'      => ['w' => '95', 'h' => 95],
+					'offset'    => ['x' => '-16', 'y' => '-16']
+				]
+			];
+
+			foreach ( $sizes as $size )
+			{
+				// Create the image
+				$favicon = \IPS\Image::create( $master->contents() );
+				$maxSize = max( $favicon->width, $favicon->height );
+				$favicon->resizeToMax( $maxSize, $maxSize );
+				$favicon->crop( $size['size']['w'], $size['size']['h'] );
+
+				$canvas = imagecreatetruecolor( $size['canvas']['w'], $size['canvas']['h'] );
+
+				imagealphablending( $canvas, FALSE );
+				imagesavealpha( $canvas, TRUE );
+
+				$trans_colour = imagecolorallocatealpha( $canvas, 0, 0, 0, 127 );
+				imagefill( $canvas, 0, 0, $trans_colour );
+
+				// Place our image on the canvas
+				imagecopy( $canvas, imagecreatefromstring( (string) $favicon ), abs($size['offset']['x']), abs($size['offset']['y']), 0, 0, $favicon->width, $favicon->height );
+
+				// Render the output image
+				ob_start();
+				imagepng( $canvas );
+				$result = ob_get_clean();
+				imagedestroy( $canvas );
+
+				// Save the result
+				$filename = sprintf( static::$windowsNameTemplate, $favicon->width, $favicon->height, 'png' );
+				$file = File::create( 'favicons_Favicons', $filename, $result, 'favicons', FALSE, NULL, FALSE );
+
+				/* Save the new favicon record */
+				$record = new Favicon();
+
+				$record->type = Favicon::WINDOWS;
 				$record->name = $file->filename;
 				$record->file = $file;
 
@@ -634,7 +700,7 @@ class _Favicon extends \IPS\Patterns\ActiveRecord
 	 */
 	public static function generateAntiCacheKey( $length=10, $update=TRUE )
 	{
-		$key = bin2hex( openssl_random_pseudo_bytes($length * 2) );
+		$key = bin2hex( openssl_random_pseudo_bytes($length / 2) );
 
 		/* Update the setting value */
 		if ( $update )

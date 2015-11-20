@@ -172,7 +172,7 @@ class _router extends \IPS\Dispatcher\Controller
 		/**
 		 * Windows
 		 */
-		if ( $type == 'windows' )
+		if ( $type == 'microsoft' )
 		{
 			if ( isset( $urls["mstile-{$width}x{$height}.png"] ) )
 			{
