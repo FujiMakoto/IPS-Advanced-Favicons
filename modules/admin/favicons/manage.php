@@ -496,6 +496,7 @@ class _manage extends \IPS\Dispatcher\Controller
 				Db::i()->update( 'core_sys_conf_settings', array( 'conf_value' => (string) $browserConfig ), array( 'conf_key=?', 'favicons_microsoftBrowserConfig' ) );
 				Db::i()->update( 'core_sys_conf_settings', array( 'conf_value' => 1 ), array( 'conf_key=?', 'favicons_setUpComplete' ) );
 				unset( \IPS\Data\Store::i()->settings );
+				Favicon::generateAntiCacheKey();
 			}
 
 			return $data;
@@ -628,6 +629,8 @@ class _manage extends \IPS\Dispatcher\Controller
 			$browserConfig = \IPS\File::create( 'favicons_Favicons', 'browserconfig.xml', Favicon::microsoftBrowserConfig(), 'favicons', FALSE, NULL, FALSE );
 
 			/* Update our setting values and clear cached data */
+			Favicon::generateAntiCacheKey();
+
 			$s->favicons_microsoftBrowserConfig = (string) $browserConfig;
 			Db::i()->update( 'core_sys_conf_settings', array( 'conf_value' => (string) $browserConfig ), array( 'conf_key=?', 'favicons_microsoftBrowserConfig' ) );
 

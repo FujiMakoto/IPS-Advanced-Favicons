@@ -31,7 +31,7 @@ class _Favicon extends \IPS\Patterns\ActiveRecord
 	/**
 	 * @brief   Standard filename template
 	 */
-	public static $masterNameTemplate = 'favicon-%d-%d.%s';
+	public static $masterNameTemplate = 'favicon-%dx%d.%s';
 
 	/**
 	 * @brief   Standard HTML template
@@ -53,7 +53,7 @@ class _Favicon extends \IPS\Patterns\ActiveRecord
 	/**
 	 * @brief   Android filename template
 	 */
-	public static $androidNameTemplate = 'android-chrome-%d-%d.%s';
+	public static $androidNameTemplate = 'android-chrome-%dx%d.%s';
 
 	/**
 	 * @brief   Android HTML template
@@ -78,7 +78,7 @@ class _Favicon extends \IPS\Patterns\ActiveRecord
 	/**
 	 * @brief   Apple filename template
 	 */
-	public static $appleNameTemplate = 'apple-touch-icon-%d-%d.%s';
+	public static $appleNameTemplate = 'apple-touch-icon-%dx%d.%s';
 
 	/**
 	 * @brief   Apple HTML template
@@ -97,7 +97,7 @@ class _Favicon extends \IPS\Patterns\ActiveRecord
 	/**
 	 * @brief   Windows filename template
 	 */
-	public static $windowsNameTemplate = 'mstile-%d-%d.%s';
+	public static $windowsNameTemplate = 'mstile-%dx%d.%s';
 
 	/**
 	 * @brief   Windows HTML template
@@ -195,7 +195,7 @@ class _Favicon extends \IPS\Patterns\ActiveRecord
 				if ( Settings::i()->htaccess_mod_rewrite )
 					return NULL;
 
-				return '<link rel="shortcut icon" href="' . htmlspecialchars( (string) $this->file->url ) . '">';
+				return '<link rel="shortcut icon" href="' . htmlspecialchars( $this->getFileUrl( $this->file ) ) . '">';
 			}
 		}
 
@@ -216,7 +216,7 @@ class _Favicon extends \IPS\Patterns\ActiveRecord
 		}
 
 		if ( $this->type === static::SAFARI )
-			return '<link rel="mask-icon" href="' . htmlspecialchars( (string) $this->file->url ) . '" color="#5bbad5">';
+			return '<link rel="mask-icon" href="' . htmlspecialchars( $this->getFileUrl( $this->file ) ) . '" color="#5bbad5">';
 
 		if ( $this->type === static::IOS )
 			$type = 'apple';
@@ -225,9 +225,21 @@ class _Favicon extends \IPS\Patterns\ActiveRecord
 		if ( $type )
 		{
 			$htmlTemplate = "{$type}HtmlTemplate";
-			$url = htmlspecialchars( (string) $this->file->url );
+			$url = htmlspecialchars( $this->getFileUrl( $this->file ) );
 			return sprintf( static::$$htmlTemplate, $url, $this->sizes, File::getMimeType( (string) $this->file ) );
 		}
+	}
+
+	/**
+	 * Internal method for retrieving a favicon files URL with an anti-cache key appended to it
+	 *
+	 * @param   \IPS\File   $file
+	 * @return  string
+	 */
+	protected function getFileUrl( $file )
+	{
+		$antiCacheKey = Settings::i()->favicons_antiCacheKey;
+		return (string) $file->url->setQueryString( 'v', $antiCacheKey );
 	}
 
 	/**
