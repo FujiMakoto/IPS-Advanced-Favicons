@@ -76,7 +76,7 @@ class _manage extends \IPS\Dispatcher\Controller
 				'file'  => function ( $val, $row ) use ( $self )
 				{
 					$favicon = Favicon::constructFromData( $row );
-					$imgUrl = (string) $favicon->file->url;
+					$imgUrl = $favicon->getFileUrl();
 					return Theme::i()->getTemplate( 'manage' )->faviconPreview( $imgUrl, $favicon->name );
 				},
 				'type'  => function ( $val, $row ) use ( $self )
@@ -712,16 +712,13 @@ class _manage extends \IPS\Dispatcher\Controller
 
 
 	/**
-	 * Favicon Settings
+	 * Edit / replace favicon image
 	 *
 	 * @return  void
 	 */
 	public function edit()
 	{
 		Dispatcher::i()->checkAcpPermission( 'favicons_create' );
-
-		$s = Settings::i();
-		$form = new Form( 'settings' );
 
 		try
 		{
@@ -733,6 +730,7 @@ class _manage extends \IPS\Dispatcher\Controller
 			return;
 		}
 
+		$form = new Form( 'settings' );
 		$form->add( new Form\Upload( "favicons_edit_new", NULL, TRUE,
 				[
 						'storageExtension' => 'favicons_Favicons',
@@ -749,7 +747,7 @@ class _manage extends \IPS\Dispatcher\Controller
 			$fileName = $favicon->name;
 			$favicon->file->delete();
 			$newImage = file_get_contents( $values[ "favicons_edit_new" ] );
-			$file = \IPS\File::create( 'favicons_Favicons', $fileName, $newImage, 'favicons', FALSE, NULL, FALSE );
+			\IPS\File::create( 'favicons_Favicons', $fileName, $newImage, 'favicons', FALSE, NULL, FALSE );
 			Favicon::generateAntiCacheKey();
 
 			Output::i()->redirect( Url::internal( 'app=favicons&module=favicons&controller=manage' ), '', 302 );
