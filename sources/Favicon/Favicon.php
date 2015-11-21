@@ -655,7 +655,10 @@ class _Favicon extends \IPS\Patterns\ActiveRecord
 			$item->addAttribute( 'src', (string) $favicon->file->url );
 		}
 
-		$tile->addChild( 'TileColor', $s->favicons_msTileColor );
+		$tileColor = ( $s->favicons_msTileColor == 'custom' )
+				? $s->favicons_msTileColor_custom
+				: $s->favicons_msTileColor;
+		$tile->addChild( 'TileColor', $tileColor );
 		return $xml->asXML();
 	}
 
