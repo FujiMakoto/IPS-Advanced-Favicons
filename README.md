@@ -28,4 +28,4 @@ After the application has been installed, navigate to the Manage Favicons page, 
 
 From this page, launch the Setup Wizard and follow the on-screen prompts. That's it! Once you've completed the setup, you'll be given a link which you can use to ensure the application is working correctly.
 
-**Note:** Due to what appears to be a [bug](https://github.com/RealFaviconGenerator/realfavicongenerator/issues/202) with the RealFaviconGenerator website, you will be told that your site is missing some Windows 8/10 images, when this should not be the case. You can load these images directly yourself to confirm nothing is wrong here.
+**Note:** Due to what appears to be a [bug](https://github.com/RealFaviconGenerator/realfavicongenerator/issues/202) with the RealFaviconGenerator website at the time of writing this, you may be told that your site is missing some Windows 8/10 images, when this should not be the case. You can load these images directly yourself to confirm nothing is wrong here.
