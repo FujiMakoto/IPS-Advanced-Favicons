@@ -1,5 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <theme name="Default" author_name="Invision Power Services, Inc" author_url="http://www.invisionpower.com">
+ <template template_group="manage" template_name="edit" template_data="$favicon, $form" template_location="admin" template_app="favicons"><![CDATA[<div class="ipsContained ipsPad_top">
+	<div class="ipsType_center">
+		<h1>{$favicon->name}</h1>
+		<div class="ipsPad">
+			<div class="ipsImage">
+				<img src="{$favicon->getFileUrl()}" alt="{$favicon->name}">
+			</div>
+		</div>
+	</div>
+	{$form|raw}
+</div>]]></template>
  <template template_group="manage" template_name="faviconPreview" template_data="$imageUrl, $imageAlt='preview'" template_location="admin" template_app="favicons"><![CDATA[<div class="ipsImage ipsImage_thumbnailed faviconsPreviewImage">
 	<img src="{$imageUrl}" alt="{$imageAlt}">
 </div>]]></template>
@@ -58,7 +69,47 @@
 
 	{$form|raw}
 </div>]]></template>
- <template template_group="wizard" template_name="step6" template_data="$rfgTestUrl" template_location="admin" template_app="favicons"><![CDATA[<div class="ipsContained ipsPad_top">
+ <template template_group="wizard" template_name="step6" template_data="$form, $settingsUrl, $testUrl" template_location="admin" template_app="favicons"><![CDATA[<div class="ipsContained ipsPad_top">
+	<div class="ipsType_center">
+		<h1>{lang="favicons_rewritesHeader"}</h1>
+		<h4>{lang="favicons_rewrites_hDesc"}</h4>
+	</div>
+	<div class="ipsPad">
+		<p>{lang="favicons_rewrites_pDesc"}</p>
+		<p>{lang="favicons_rewrites_step1" sprintf="$settingsUrl"}</p>
+		<p>{lang="favicons_rewrites_step2"}</p>
+
+		<!-- Begin .htaccess rewrite rules -->
+		<div data-role="commentContent" itemprop="text" class="ipsType_normal ipsType_richText ipsContained" data-controller="core.front.core.lightboxedImages">
+<pre style="font-family:Consolas, 'Liberation Mono', Menlo, Courier, monospace;font-size:13.6px;margin-top:0px;margin-bottom:0px;font-style:normal;font-variant:normal;font-weight:normal;line-height:1.45;padding:16px;color:rgb(51,51,51);letter-spacing:normal;text-indent:0px;text-transform:none;word-spacing:0px;background-color:rgb(247,247,247);">&lt;<span style="color:rgb(99,163,92);">IfModule</span> mod_rewrite.c&gt;
+<span style="color:rgb(0,134,179);">Options</span> -MultiViews
+<span style="color:rgb(0,134,179);">RewriteEngine</span> On
+<span style="color:rgb(0,134,179);">RewriteBase</span> /
+
+<span style="color:rgb(150,152,150);"># Begin rewrite rules for the Advanced Favicons IPS application</span>
+<span style="color:rgb(0,134,179);">RewriteRule</span> <span style="color:rgb(24,54,145);">^favicon.ico$</span> <span style="color:rgb(24,54,145);">/index.php</span> <span style="color:rgb(24,54,145);">[L]</span>
+<span style="color:rgb(0,134,179);">RewriteRule</span> <span style="color:rgb(24,54,145);">^favicon-\d{1,3}x\d{1,3}.png$</span> <span style="color:rgb(24,54,145);">/index.php</span> <span style="color:rgb(24,54,145);">[L]</span>
+<span style="color:rgb(0,134,179);">RewriteRule</span> <span style="color:rgb(24,54,145);">^apple-touch-icon(-precomposed|-\d{1,3}x\d{1,3})?.png$</span> <span style="color:rgb(24,54,145);">/index.php</span> <span style="color:rgb(24,54,145);">[L]</span>
+<span style="color:rgb(0,134,179);">RewriteRule</span> <span style="color:rgb(24,54,145);">^safari-pinned-tab.svg$</span> <span style="color:rgb(24,54,145);">/index.php</span> <span style="color:rgb(24,54,145);">[L]</span>
+<span style="color:rgb(0,134,179);">RewriteRule</span> <span style="color:rgb(24,54,145);">^mstile-\d{1,3}x\d{1,3}.png$</span> <span style="color:rgb(24,54,145);">/index.php</span> <span style="color:rgb(24,54,145);">[L]</span>
+<span style="color:rgb(0,134,179);">RewriteRule</span> <span style="color:rgb(24,54,145);">^android-chrome-\d{1,3}x\d{1,3}.png$</span> <span style="color:rgb(24,54,145);">/index.php</span> <span style="color:rgb(24,54,145);">[L]</span>
+<span style="color:rgb(150,152,150);"># End rewrite rules for the Advanced Favicons IPS application</span>
+
+<span style="color:rgb(0,134,179);">RewriteCond</span> <span style="color:rgb(0,134,179);">%{REQUEST_FILENAME}</span> <span style="color:rgb(24,54,145);">!-f</span>
+<span style="color:rgb(0,134,179);">RewriteRule</span> <span style="color:rgb(24,54,145);">\.(js|css|jpeg|jpg|gif|png|ico)(\?|$)</span> <span style="color:rgb(24,54,145);">/404error.php</span> <span style="color:rgb(24,54,145);">[L,NC]</span>
+
+<span style="color:rgb(0,134,179);">RewriteCond</span> <span style="color:rgb(0,134,179);">%{REQUEST_FILENAME}</span> <span style="color:rgb(24,54,145);">!-f</span>
+<span style="color:rgb(0,134,179);">RewriteCond</span> <span style="color:rgb(0,134,179);">%{REQUEST_FILENAME}</span> <span style="color:rgb(24,54,145);">!-d</span>
+<span style="color:rgb(0,134,179);">RewriteRule</span> <span style="color:rgb(24,54,145);">.</span> <span style="color:rgb(24,54,145);">/index.php</span> <span style="color:rgb(24,54,145);">[L]</span>
+&lt;/<span style="color:rgb(99,163,92);">IfModule</span>&gt;</pre>
+		</div>
+		<!-- End .htaccess rewrite rules -->
+
+		<p>{lang="favicons_rewrites_step3" sprintf="$testUrl"}</p>
+		{$form|raw}
+	</div>
+</div>]]></template>
+ <template template_group="wizard" template_name="step7" template_data="$rfgTestUrl" template_location="admin" template_app="favicons"><![CDATA[<div class="ipsContained ipsPad_top">
 	<div class="ipsType_center">
 		<h1>{lang="favicons_reviewHeader"}</h1>
 		<h4>{lang="favicons_review_hDesc"}</h4>

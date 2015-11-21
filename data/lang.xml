@@ -73,9 +73,19 @@ For best results, this image should be at least 192 x 192px in size.]]></word>
   <word key="favicons_safari_hDesc" js="0"><![CDATA[Safari 9 for Mac OS X El Capitan implements pinned tabs. This feature relies on an SVG icon. This icon must be monochrome and Safari does the rest.<br>
 This is optional and can be skipped if you do not have a SVG image to use. Safari uses the first letter of your domain name to create a default icon in this case.]]></word>
   <word key="favicons_safariSvg" js="0">Safari SVG image</word>
+  <word key="favicons_safariTheme" js="0">Safari theme color</word>
+  <word key="favicons_safariTheme_desc" js="0">This setting is only relevant if a custom SVG image is being used.</word>
   <word key="favicons_windows" js="0">Windows</word>
   <word key="favicons_windowsHeader" js="0">Windows 8 and 10</word>
   <word key="favicons_windows_hDesc" js="0">Windows 8 users can pin your website on their desktop. Your site appears as a tile, just like a native Windows 8 app.</word>
+  <word key="favicons_rewrites" js="0">Rewrites</word>
+  <word key="favicons_rewritesHeader" js="0">Enable rewrites for full browser compatibility</word>
+  <word key="favicons_rewrites_hDesc" js="0">To obtain full browser compatibility, you will need to enable some rewrite rules for the Advanced Favicons application.</word>
+  <word key="favicons_rewrites_pDesc" js="0">While this is optional and can be skipped, it is recommended you take the time to enable these rewrite rules if your server supports it.</word>
+  <word key="favicons_rewrites_step1" js="0"><![CDATA[<strong>Step 1)</strong><br>First, make sure you have both Friendly URLs and Rewrite URLs enabled <a href="%s" target="_blank">here</a>.]]></word>
+  <word key="favicons_rewrites_step2" js="0"><![CDATA[<strong>Step 2)</strong><br>Next, modify the contents of your .htaccess rewrite rules for IPS so that they match the following:]]></word>
+  <word key="favicons_rewrites_step3" js="0"><![CDATA[<strong>Step 3)</strong><br>Finally, confirm everything is working by visiting <a href="%s" target="_blank">this link</a>. You should be redirected to your favicon image. If not, double check your rewrite rules and try again.]]></word>
+  <word key="favicons_rewrites_enable" js="0">Enable Advanced Favicon rewrite rules?</word>
   <word key="favicons_review" js="0">Complete</word>
   <word key="favicons_reviewHeader" js="0">All favicons generated successfully!</word>
   <word key="favicons_review_hDesc" js="0">That's it! Your website should now have favicons that are compliant with all devices. Want to test it out? Follow the link below!</word>
@@ -87,5 +97,7 @@ This is optional and can be skipped if you do not have a SVG image to use. Safar
   <word key="favicons_filter_windows" js="0">Windows</word>
   <word key="favicons_error_runSetupFirst" js="0">You must complete the Setup Wizard before accessing the Favicon Settings page</word>
   <word key="favicons_error_noFaviconsToDelete" js="0">You need to create some favicons before you can delete them!</word>
+  <word key="favicons_edit" js="0">Edit Favicon</word>
+  <word key="favicons_edit_new" js="0">New favicon</word>
  </app>
 </language>
