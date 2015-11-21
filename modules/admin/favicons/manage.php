@@ -142,6 +142,28 @@ class _manage extends \IPS\Dispatcher\Controller
 		}
 		$table->rootButtons = $rootButtons;
 
+		$table->rowButtons = function ( $row ) use ( $self )
+		{
+			$return = array();
+
+			if ( Member::loggedIn()->hasAcpRestriction( 'favicons', 'favicons', 'favicons_create' ) )
+			{
+				$return[ 'edit' ] = array(
+						'icon'  => 'pencil',
+						'title' => 'favicons_edit',
+						'link'  => \IPS\Http\Url::internal( 'app=favicons&module=favicons&controller=manage&do=edit&id=' ) . $row['id'],
+						'data'  => array(
+								'ipsDialog'       => '',
+								'ipsDialog-title' => \IPS\Member::loggedIn()->language()->addToStack(
+										'favicons_edit'
+								)
+						)
+				);
+			}
+
+			return $return;
+		};
+
 		/* Display */
 		Output::i()->title     = Member::loggedIn()->language()->addToStack( 'favicons_manage_title' );
 		Output::i()->cssFiles  = array_merge( Output::i()->cssFiles, Theme::i()->css( 'favicons.css', 'favicons', 'admin' ) );
@@ -688,6 +710,58 @@ class _manage extends \IPS\Dispatcher\Controller
 		Output::i()->output = $form;
 	}
 
+
+	/**
+	 * Favicon Settings
+	 *
+	 * @return  void
+	 */
+	public function edit()
+	{
+		Dispatcher::i()->checkAcpPermission( 'favicons_create' );
+
+		$s = Settings::i();
+		$form = new Form( 'settings' );
+
+		try
+		{
+			$favicon = Favicon::load( (int) Request::i()->id );
+		}
+		catch ( \OutOfRangeException $e )
+		{
+			Output::i()->error( '2FAVI201/2' );
+			return;
+		}
+
+		$form->add( new Form\Upload( "favicons_edit_new", NULL, TRUE,
+				[
+						'storageExtension' => 'favicons_Favicons',
+						'image'            => array( 'maxWidth' => $favicon->width, 'maxHeight' => $favicon->height ),
+						'temporary'        => TRUE
+				]
+		) );
+
+		/**
+		 * Save settings
+		 */
+		if ( $values = $form->values() )
+		{
+			$fileName = $favicon->name;
+			$favicon->file->delete();
+			$newImage = file_get_contents( $values[ "favicons_edit_new" ] );
+			$file = \IPS\File::create( 'favicons_Favicons', $fileName, $newImage, 'favicons', FALSE, NULL, FALSE );
+			Favicon::generateAntiCacheKey();
+
+			Output::i()->redirect( Url::internal( 'app=favicons&module=favicons&controller=manage' ), '', 302 );
+			return;
+		}
+
+		/**
+		 * Output
+		 */
+		Output::i()->output = Theme::i()->getTemplate( 'manage' )->edit( $favicon, $form );
+	}
+
 	/**
 	 * Reset / delete ALL favicon images and manifest files
 	 *
@@ -697,7 +771,7 @@ class _manage extends \IPS\Dispatcher\Controller
 	{
 		if ( !count( Favicon::favicons() ) )
 		{
-			Output::i()->error( 'favicons_error_noFaviconsToDelete', '1FAVI201/2', 404 );
+			Output::i()->error( 'favicons_error_noFaviconsToDelete', '1FAVI201/3', 404 );
 			return;
 		}
 

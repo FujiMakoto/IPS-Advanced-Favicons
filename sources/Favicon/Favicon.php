@@ -231,11 +231,12 @@ class _Favicon extends \IPS\Patterns\ActiveRecord
 	/**
 	 * Retrieve the favicon files URL with an anti-cache key appended to it
 	 *
-	 * @param   \IPS\File   $file
+	 * @param   \IPS\File|NULL  $file
 	 * @return  string
 	 */
-	public function getFileUrl( $file )
+	public function getFileUrl( $file=NULL )
 	{
+		$file = $file ?: $this->file;
 		$antiCacheKey = Settings::i()->favicons_antiCacheKey;
 		return (string) $file->url->setQueryString( 'v', $antiCacheKey );
 	}

@@ -1,0 +1,12 @@
+<ips:template parameters="$favicon, $form" />
+<div class="ipsContained ipsPad_top">
+	<div class="ipsType_center">
+		<h1>{$favicon->name}</h1>
+		<div class="ipsPad">
+			<div class="ipsImage">
+				<img src="{$favicon->getFileUrl()}" alt="{$favicon->name}">
+			</div>
+		</div>
+	</div>
+	{$form|raw}
+</div>
