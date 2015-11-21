@@ -172,6 +172,7 @@ class _manage extends \IPS\Dispatcher\Controller
 				'favicons_ios'      => array( $this, '_stepIOS' ),
 				'favicons_safari'   => array( $this, '_stepSafari' ),
 				'favicons_windows'  => array( $this, '_stepWindows' ),
+				'favicons_rewrites' => array( $this, '_stepRewrites' ),
 				'favicons_review'   => array( $this, '_stepReview' ),
 		), Url::internal( 'app=favicons&module=favicons&controller=manage&do=wizard' ), TRUE, $initialData );
 
@@ -409,6 +410,8 @@ class _manage extends \IPS\Dispatcher\Controller
 				]
 		) );
 
+		$form->add( new Form\Color( 'favicons_safariTheme', '#5bbad5', TRUE ) );
+
 		if ( $values = $form->values() )
 		{
 			if ( !isset( Request::i()->ajaxValidate ) )
@@ -508,6 +511,34 @@ class _manage extends \IPS\Dispatcher\Controller
 		return Theme::i()->getTemplate( 'wizard' )->step5( $form );
 	}
 
+	/**
+	 * Wizard step: Prompt the user to enable / disable rewrites
+	 *
+	 * @param   array   $data   The current wizard data
+	 * @return  string|array
+	 */
+	public function _stepRewrites( $data )
+	{
+		$form = new Form( 'rewrites', 'continue', Url::internal( 'app=favicons&module=favicons&controller=manage&do=wizard&_step=favicons_rewrites' ) );
+		$form->ajaxOutput = TRUE;
+		$form->class = 'ipsForm_vertical';
+
+		$form->add( new Form\YesNo( 'favicons_rewrites_enable', TRUE ) );
+
+		if ( $values = $form->values() )
+		{
+			if ( !isset( Request::i()->ajaxValidate ) )
+			{
+				$form->saveAsSettings( $values );
+			}
+
+			return $data;
+		}
+
+		$settingsUrl = (string) Url::internal( 'app=core&module=promotion&controller=seo&tab=urls' );
+		$testUrl = Url::baseUrl() . 'apple-touch-icon-144x144.png';
+		return Theme::i()->getTemplate( 'wizard' )->step6( $form, $settingsUrl, $testUrl );
+	}
 
 	/**
 	 * Wizard step: Completion / review
@@ -527,7 +558,7 @@ class _manage extends \IPS\Dispatcher\Controller
 			Output::i()->redirect( Url::internal( 'app=favicons&module=favicons&controller=manage' ) );
 		}
 
-		return Theme::i()->getTemplate( 'wizard' )->step6( $rfgTestUrl );
+		return Theme::i()->getTemplate( 'wizard' )->step7( $rfgTestUrl );
 	}
 
 	/**

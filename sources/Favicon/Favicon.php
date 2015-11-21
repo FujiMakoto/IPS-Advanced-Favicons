@@ -190,7 +190,7 @@ class _Favicon extends \IPS\Patterns\ActiveRecord
 
 			if ( ( $this->file->filename == 'favicon.ico' ) )
 			{
-				if ( Settings::i()->htaccess_mod_rewrite )
+				if ( Settings::i()->favicons_rewrites_enable )
 					return NULL;
 
 				return '<link rel="shortcut icon" href="' . htmlspecialchars( $this->getFileUrl( $this->file ) ) . '">';
@@ -214,7 +214,7 @@ class _Favicon extends \IPS\Patterns\ActiveRecord
 		}
 
 		if ( $this->type === static::SAFARI )
-			return '<link rel="mask-icon" href="' . htmlspecialchars( $this->getFileUrl( $this->file ) ) . '" color="#5bbad5">';
+			return '<link rel="mask-icon" href="' . htmlspecialchars( $this->getFileUrl( $this->file ) ) . '" color="' . Settings::i()->favicons_safariTheme . '">';
 
 		if ( $this->type === static::IOS )
 			$type = 'apple';
@@ -281,6 +281,7 @@ class _Favicon extends \IPS\Patterns\ActiveRecord
 
 		/* Clear any cached HTML output for favicons */
 		unset( \IPS\Data\Store::i()->favicons_html );
+		unset( \IPS\Data\Store::i()->favicons_urls );
 	}
 
 	/**

@@ -28,6 +28,10 @@
         "default": ""
     },
     {
+        "key": "favicons_antiCacheKey",
+        "default": "bWFrb3Rv"
+    },
+    {
         "key": "favicons_iosFancy",
         "default": ""
     },
@@ -42,6 +46,14 @@
     {
         "key": "favicons_msTileColor_custom",
         "default": ""
+    },
+    {
+        "key": "favicons_rewrites_enable",
+        "default": "0"
+    },
+    {
+        "key": "favicons_safariTheme",
+        "default": "#5bbad5"
     },
     {
         "key": "favicons_setUpComplete",

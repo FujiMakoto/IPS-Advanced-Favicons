@@ -116,12 +116,26 @@ This is optional and can be skipped if you do not have a SVG image to use. Safar
 	'favicons_safariSvg'        => 'Safari SVG image',
 	// 'favicons_safariSvg_desc'   => 'If you do not have an SVG image to use, skip this upload.',
 
+	'favicons_safariTheme'      => 'Safari theme color',
+	'favicons_safariTheme_desc' => 'This setting is only relevant if a custom SVG image is being used.',
+
 	# Step 5 - Windows
 	'favicons_windows'          => 'Windows',
 	'favicons_windowsHeader'    => 'Windows 8 and 10',
 	'favicons_windows_hDesc'    => 'Windows 8 users can pin your website on their desktop. Your site appears as a tile, just like a native Windows 8 app.',
 
-	# Step 6 - Review
+	# Step 6 - Rewrites
+	'favicons_rewrites'         => 'Rewrites',
+	'favicons_rewritesHeader'   => 'Enable rewrites for full browser compatibility',
+	'favicons_rewrites_hDesc'   => 'To obtain full browser compatibility, you will need to enable some rewrite rules for the Advanced Favicons application.',
+	'favicons_rewrites_pDesc'   => 'While this is optional and can be skipped, it is recommended you take the time to enable these rewrite rules if your server supports it.',
+	'favicons_rewrites_step1'   => '<strong>Step 1)</strong><br>First, make sure you have both Friendly URLs and Rewrite URLs enabled <a href="%s" target="_blank">here</a>.',
+	'favicons_rewrites_step2'   => '<strong>Step 2)</strong><br>Next, modify the contents of your .htaccess rewrite rules for IPS so that they match the following:',
+	'favicons_rewrites_step3'   => '<strong>Step 3)</strong><br>Finally, confirm everything is working by visiting <a href="%s" target="_blank">this link</a>. You should be redirected to your favicon image. If not, double check your rewrite rules and try again.',
+
+	'favicons_rewrites_enable'  => 'Enable Advanced Favicon rewrite rules?',
+
+	# Step 7 - Review
 	'favicons_review'       => 'Complete',
 	'favicons_reviewHeader' => 'All favicons generated successfully!',
 	'favicons_review_hDesc' => 'That\'s it! Your website should now have favicons that are compliant with all devices. Want to test it out? Follow the link below!',
