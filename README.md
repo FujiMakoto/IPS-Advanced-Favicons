@@ -1,4 +1,5 @@
 # Advanced Favicons
+
 ## Introduction
 Advanced Favicons is a third party IPS application that handles the tedious and deceptively complex task of generating favicons for your IPS community website.
 
@@ -12,8 +13,15 @@ I hope not. Advanced Favicons to the rescue then!
 
 This application will handle the mundane and complex task of generating all of these files for you in an easy, step by step process. All you need to do is upload a single, high quality logo image that you wish to use as your favicons base image, answer a few basic questions about how you'd like your site to be displayed on mobile devices, and you're done!
 
-## Setup and configuration
+## Demonstration
 
+You can see a quick "before" and after demonstration of the application here (you can replace community.invisionpower.com with your own forum as well),
+
+**Before**: http://realfavicongenerator.net/favicon_checker?site=community.invisionpower.com
+
+**After**: http://realfavicongenerator.net/favicon_checker?site=https%3A%2F%2Fwww.makoto.io
+
+## Setup and configuration
 First, install the application in your AdminCP by uploading the included .tar file in the Applications page, located under the System tab.
 
 After the application has been installed, navigate to the Manage Favicons page, located under the Customization tab.
