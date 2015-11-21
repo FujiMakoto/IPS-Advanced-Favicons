@@ -570,7 +570,12 @@ class _manage extends \IPS\Dispatcher\Controller
 	 */
 	public function _stepReview( $data )
 	{
-		$rfgTestUrl = Url::external( 'http://realfavicongenerator.net/favicon_checker' )->setQueryString( 'site', Url::baseUrl() )->makeSafeForAcp();
+		$rfgTestUrl = Url::external( 'http://realfavicongenerator.net/favicon_checker' )->setQueryString( 'site', Url::baseUrl() );
+		if ( !Settings::i()->favicons_rewrites_enable )
+		{
+			$rfgTestUrl = $rfgTestUrl->setQueryString( 'ignore_root_issues', 'on' );
+		}
+		$rfgTestUrl = $rfgTestUrl->makeSafeForAcp();
 
 		$form = new Form( 'review', 'Complete setup' );
 		$form->ajaxOutput = TRUE;
