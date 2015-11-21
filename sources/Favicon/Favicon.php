@@ -206,12 +206,7 @@ class _Favicon extends \IPS\Patterns\ActiveRecord
 		}
 
 		if ( $this->type === static::WINDOWS )
-		{
 			$type = 'windows';
-
-			if ( ( $this->width != 144 ) and ( $this->height != 144 ) )
-				return NULL;
-		}
 
 		if ( $this->type === static::SAFARI )
 			return '<link rel="mask-icon" href="' . htmlspecialchars( $this->getFileUrl( $this->file ) ) . '" color="' . Settings::i()->favicons_safariTheme . '">';
@@ -491,21 +486,25 @@ class _Favicon extends \IPS\Patterns\ActiveRecord
 		{
 			$sizes = [
 				[
+					'name'      => 'mstile-150x150.png',
 					'canvas'    => ['w' => '270', 'h' => 270],
 					'size'      => ['w' => '135', 'h' => 135],
 					'offset'    => ['x' => '-67', 'y' => '-45']
 				],
 				[
+					'name'      => 'mstile-310x150.png',
 					'canvas'    => ['w' => '558', 'h' => 270],
 					'size'      => ['w' => '126', 'h' => 126],
 					'offset'    => ['x' => '-216', 'y' => '-50']
 				],
 				[
+					'name'      => 'mstile-310x310.png',
 					'canvas'    => ['w' => '558', 'h' => 558],
 					'size'      => ['w' => '259', 'h' => 259],
 					'offset'    => ['x' => '-149', 'y' => '-128']
 				],
 				[
+					'name'      => 'mstile-70x70.png',
 					'canvas'    => ['w' => '128', 'h' => 128],
 					'size'      => ['w' => '95', 'h' => 95],
 					'offset'    => ['x' => '-16', 'y' => '-16']
@@ -538,8 +537,7 @@ class _Favicon extends \IPS\Patterns\ActiveRecord
 				imagedestroy( $canvas );
 
 				// Save the result
-				$filename = sprintf( static::$windowsNameTemplate, $favicon->width, $favicon->height, 'png' );
-				$file = File::create( 'favicons_Favicons', $filename, $result, 'favicons', FALSE, NULL, FALSE );
+				$file = File::create( 'favicons_Favicons', $size['name'], $result, 'favicons', FALSE, NULL, FALSE );
 
 				/* Save the new favicon record */
 				$record = new Favicon();
