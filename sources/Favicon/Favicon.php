@@ -641,9 +641,8 @@ class _Favicon extends \IPS\Patterns\ActiveRecord
 	{
 		$s = Settings::i();
 
-		$xml = new \SimpleXMLElement( '<xml/>' );
-		$browserConfig = $xml->addChild( 'browserconfig' );
-		$msApplication = $browserConfig->addChild( 'msapplication' );
+		$xml = new \SimpleXMLElement( '<browserconfig/>' );
+		$msApplication = $xml->addChild( 'msapplication' );
 		$tile = $msApplication->addChild( 'tile' );
 
 		$favicons = static::favicons( static::WINDOWS );
