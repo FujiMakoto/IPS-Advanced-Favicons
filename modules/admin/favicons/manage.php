@@ -673,6 +673,18 @@ class _manage extends \IPS\Dispatcher\Controller
 		$form->add( new Form\Color( 'favicons_msTileColor_custom', $s->favicons_msTileColor_custom ) );
 
 		/**
+		 * Rewrite rules
+		 */
+		$settingsUrl = (string) Url::internal( 'app=core&module=promotion&controller=seo&tab=urls' );
+		$testUrl = Url::baseUrl() . 'apple-touch-icon-144x144.png';
+
+		$form->addTab( 'favicons_rewrites' );
+		//$form->addHeader( 'favicons_msHeader' );
+		$form->addHtml( Theme::i()->getTemplate( 'manage' )->rewriteRules( $settingsUrl, $testUrl ) );
+
+		$form->add( new Form\YesNo( 'favicons_rewrites_enable', TRUE ) );
+
+		/**
 		 * Save settings
 		 */
 		if ( $values = $form->values() )
