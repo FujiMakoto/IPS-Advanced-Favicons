@@ -489,25 +489,29 @@ class _Favicon extends \IPS\Patterns\ActiveRecord
 					'name'      => 'mstile-150x150.png',
 					'canvas'    => ['w' => '270', 'h' => 270],
 					'size'      => ['w' => '135', 'h' => 135],
-					'offset'    => ['x' => '-67', 'y' => '-45']
+					'offset'    => ['x' => '-67', 'y' => '-45'],
+					'public'    => ['w' => '150', 'h' => '150']
 				],
 				[
 					'name'      => 'mstile-310x150.png',
 					'canvas'    => ['w' => '558', 'h' => 270],
 					'size'      => ['w' => '126', 'h' => 126],
-					'offset'    => ['x' => '-216', 'y' => '-50']
+					'offset'    => ['x' => '-216', 'y' => '-50'],
+					'public'    => ['w' => '310', 'h' => '150']
 				],
 				[
 					'name'      => 'mstile-310x310.png',
 					'canvas'    => ['w' => '558', 'h' => 558],
 					'size'      => ['w' => '259', 'h' => 259],
-					'offset'    => ['x' => '-149', 'y' => '-128']
+					'offset'    => ['x' => '-149', 'y' => '-128'],
+					'public'    => ['w' => '310', 'h' => '310']
 				],
 				[
 					'name'      => 'mstile-70x70.png',
 					'canvas'    => ['w' => '128', 'h' => 128],
 					'size'      => ['w' => '95', 'h' => 95],
-					'offset'    => ['x' => '-16', 'y' => '-16']
+					'offset'    => ['x' => '-16', 'y' => '-16'],
+					'public'    => ['w' => '70', 'h' => '70']
 				]
 			];
 
@@ -542,9 +546,11 @@ class _Favicon extends \IPS\Patterns\ActiveRecord
 				/* Save the new favicon record */
 				$record = new Favicon();
 
-				$record->type = Favicon::WINDOWS;
-				$record->name = $file->filename;
-				$record->file = $file;
+				$record->type   = Favicon::WINDOWS;
+				$record->name   = $file->filename;
+				$record->file   = $file;
+				$record->width  = $size['public']['w'];
+				$record->height = $size['public']['h'];
 
 				$record->save();
 			}
@@ -641,14 +647,21 @@ class _Favicon extends \IPS\Patterns\ActiveRecord
 	{
 		$s = Settings::i();
 
-		$xml = new \SimpleXMLElement( '<browserconfig/>' );
+		$xml = new \SimpleXMLElement( '<?xml version="1.0" encoding="utf-8"?><browserconfig/>' );
 		$msApplication = $xml->addChild( 'msapplication' );
 		$tile = $msApplication->addChild( 'tile' );
 
 		$favicons = static::favicons( static::WINDOWS );
 		foreach ( $favicons as $favicon )
 		{
-			$item = $tile->addChild( "square{$favicon->sizes}logo" );
+			if ( $favicon->width == $favicon->height )
+			{
+				$item = $tile->addChild( "square{$favicon->sizes}logo" );
+			}
+			else
+			{
+				$item = $tile->addChild( "wide{$favicon->sizes}logo" );
+			}
 			$item->addAttribute( 'src', (string) $favicon->file->url );
 		}
 
