@@ -451,7 +451,11 @@ class _manage extends \IPS\Dispatcher\Controller
 					$favicon->name = $file->filename;
 					$favicon->file = $file;
 					$favicon->save();
+
+					unset($values['favicons_safariSvg']);
 				}
+
+				$form->saveAsSettings( $values );
 			}
 
 			return $data;
