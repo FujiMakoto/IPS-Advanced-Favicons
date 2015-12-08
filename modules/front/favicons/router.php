@@ -23,7 +23,7 @@ class _router extends \IPS\Dispatcher\Controller
 	/**
 	 * Execute
 	 *
-	 * @return	void
+	 * @return    void
 	 */
 	public function execute()
 	{
@@ -33,7 +33,7 @@ class _router extends \IPS\Dispatcher\Controller
 	/**
 	 * Route favicons requested at the root level
 	 *
-	 * @return	void
+	 * @return    void
 	 */
 	protected function manage()
 	{
@@ -56,10 +56,12 @@ class _router extends \IPS\Dispatcher\Controller
 		}
 		catch ( \OutOfRangeException $e )
 		{
-			$urls = [];
+			$urls = [ ];
 			$favicons = Favicon::favicons();
 			foreach ( $favicons as $favicon )
+			{
 				$urls[ $favicon->name ] = (string) $favicon->file->url;
+			}
 
 			\IPS\Data\Store::i()->favicons_urls = json_encode( $urls );
 		}
@@ -120,10 +122,6 @@ class _router extends \IPS\Dispatcher\Controller
 
 			if ( isset( $urls["apple-touch-icon-{$width}x{$height}.png"] ) )
 			{
-				/*$favicon = Favicon::loadByName( "apple-touch-icon-{$width}x{$height}.png" );
-				Output::i()->sendOutput( $favicon->file->contents(), 200, 'image/png' );
-				return;*/
-
 				Output::i()->redirect( Url::external( $urls["apple-touch-icon-{$width}x{$height}.png"] ) );
 				return;
 			}
@@ -136,13 +134,9 @@ class _router extends \IPS\Dispatcher\Controller
 
 		if ( $type == 'apple_precomposed' )
 		{
-			if ( isset( $urls["apple-touch-icon-precomposed.png"] ) )
+			if ( isset( $urls['apple-touch-icon-precomposed.png'] ) )
 			{
-				/*$favicon = Favicon::loadByName( 'apple-touch-icon-precomposed.png' );
-				Output::i()->sendOutput( $favicon->file->contents(), 200, 'image/png' );
-				return;*/
-
-				Output::i()->redirect( Url::external( $urls["apple-touch-icon-precomposed.png"] ) );
+				Output::i()->redirect( Url::external( $urls['apple-touch-icon-precomposed.png'] ) );
 				return;
 			}
 			else
@@ -185,7 +179,6 @@ class _router extends \IPS\Dispatcher\Controller
 				return;
 			}
 		}
-
 
 		Output::i()->error( 'node_error', '2FAVI203/9' );
 	}
