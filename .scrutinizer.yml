@@ -3,9 +3,11 @@ filter:
         - 'data/*'
         - 'interface/*'
         - 'setup/*'
+        - 'sources/3rd_party/*'
         - 'tests/*'
 checks:
     php:
+        code_rating: true
         fix_php_opening_tag: false
         remove_php_closing_tag: false
         one_class_per_file: true
@@ -35,7 +37,9 @@ checks:
         classes_in_camel_caps: false  # Can't be checked since classes must start with an underscore for monkey-patching
         avoid_fixme_comments: true
         verify_property_names: false
-        avoid_unnecessary_concatenation: false
+        avoid_unnecessary_concatenation: true
+        require_scope_for_properties: true
+        require_scope_for_methods: true
 
 coding_style:
     php:
