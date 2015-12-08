@@ -1,6 +1,6 @@
 preset: none
 
-linting: true
+linting: false
 
 enabled:
   - align_double_arrow
@@ -12,6 +12,7 @@ enabled:
   - concat_with_spaces
   - duplicate_semicolon
   - function_call_space
+  - function_declaration
   - function_declaration
   - linefeed
   - method_argument_space
