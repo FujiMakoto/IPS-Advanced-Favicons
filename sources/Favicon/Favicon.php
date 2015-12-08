@@ -420,14 +420,12 @@ class _Favicon extends \IPS\Patterns\ActiveRecord
 			case 'image/x-icon':
 			case 'image/gif':
 			case 'image/png':
-				// $type = 'image/png';
 				$ext = 'png';
 				break;
 
 			default:
-				// $type = 'image/jpeg';
 				$ext =
-						'jpeg';  // TODO: I don't think we should bother with JPEG support here, this should be removed later
+						'jpeg';
 				break;
 		}
 
