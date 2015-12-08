@@ -215,7 +215,7 @@ class _Favicon extends \IPS\Patterns\ActiveRecord
 			$type = 'apple';
 
 		/* Format the HTML output and return */
-		if ( $type )
+		if ( $type !== NULL )
 		{
 			$htmlTemplate = "{$type}HtmlTemplate";
 			$url = htmlspecialchars( $this->getFileUrl( $this->file ) );
