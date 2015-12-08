@@ -199,7 +199,6 @@ class _manage extends \IPS\Dispatcher\Controller
 		$wizard = new \IPS\Helpers\Wizard(
 				[
 						'favicons_master'   => [ $this, '_stepMaster' ],
-					// 'favicons_crop'     => array( $this, '_cropImage' ),
 						'favicons_android'  => [ $this, '_stepAndroid' ],
 						'favicons_ios'      => [ $this, '_stepIOS' ],
 						'favicons_safari'   => [ $this, '_stepSafari' ],
@@ -226,7 +225,7 @@ class _manage extends \IPS\Dispatcher\Controller
 	{
 		Session::i()->csrfCheck();
 		$original = Favicon::baseImage();
-		$headers = [ "Content-Disposition" => Output::getContentDisposition( 'inline', $original->filename ) ];
+		$headers = [ 'Content-Disposition' => Output::getContentDisposition( 'inline', $original->filename ) ];
 		Output::i()->sendOutput( $original->contents(), 200, \IPS\File::getMimeType( $original->filename ), $headers );
 	}
 
@@ -349,7 +348,6 @@ class _manage extends \IPS\Dispatcher\Controller
 		}
 
 		/* Display */
-
 		return $form->customTemplate(
 				[ call_user_func_array( [ \IPS\Theme::i(), 'getTemplate' ], [ 'forms', 'core' ] ), 'popupTemplate' ]
 		);
@@ -372,7 +370,6 @@ class _manage extends \IPS\Dispatcher\Controller
 
 		$s = \IPS\Settings::i();
 		$form->add( new Form\Text( 'favicons_androidAppName', $s->board_name, TRUE ) );
-		// $form->add( new Form\Text( 'favicons_androidAppShortName', NULL, FALSE ) );  // Keeping the wizard simple
 		$form->add( new Form\Color( 'favicons_androidColor', '3C6994' ) );
 
 		# Browser mode
@@ -546,7 +543,7 @@ class _manage extends \IPS\Dispatcher\Controller
 										'#00a300' => 'favicons_msTileColor_green'
 								],
 
-							// We don't use userSuppliedInput here because we want to be able to display a Color form, not Text
+								// We don't use userSuppliedInput here because we want to be able to display a Color form, not Text
 								'unlimited'        => 'custom',
 								'unlimitedLang'    => 'favicons_msTileColor_custom',
 								'unlimitedToggles' => [ 'windows_favicons_msTileColor_custom' ]
@@ -654,7 +651,7 @@ class _manage extends \IPS\Dispatcher\Controller
 		$form = new Form( 'review', 'Complete setup' );
 		$form->ajaxOutput = TRUE;
 		$form->hiddenValues['finished'] = TRUE;
-		if ( $values = $form->values() )
+		if ( $form->values() )
 		{
 			Output::i()->redirect( Url::internal( 'app=favicons&module=favicons&controller=manage' ) );
 		}
@@ -760,7 +757,6 @@ class _manage extends \IPS\Dispatcher\Controller
 		$testUrl = Url::baseUrl() . 'apple-touch-icon-144x144.png';
 
 		$form->addTab( 'favicons_rewrites' );
-		//$form->addHeader( 'favicons_msHeader' );
 		$form->addHtml( Theme::i()->getTemplate( 'manage' )->rewriteRules( $settingsUrl, $testUrl ) );
 
 		$form->add( new Form\YesNo( 'favicons_rewrites_enable', TRUE ) );
@@ -847,7 +843,7 @@ class _manage extends \IPS\Dispatcher\Controller
 		$form = new Form( 'settings' );
 		$form->add(
 				new Form\Upload(
-						"favicons_edit_new", NULL, TRUE, [
+						'favicons_edit_new', NULL, TRUE, [
 								'storageExtension' => 'favicons_Favicons',
 								'image'            => [
 										'maxWidth'  => $favicon->width,
@@ -865,7 +861,7 @@ class _manage extends \IPS\Dispatcher\Controller
 		{
 			$fileName = $favicon->name;
 			$favicon->file->delete();
-			$newImage = file_get_contents( $values["favicons_edit_new"] );
+			$newImage = file_get_contents( $values['favicons_edit_new'] );
 			\IPS\File::create( 'favicons_Favicons', $fileName, $newImage, 'favicons', FALSE, NULL, FALSE );
 			Favicon::generateAntiCacheKey();
 
