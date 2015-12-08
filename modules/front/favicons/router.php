@@ -44,7 +44,6 @@ class _router extends \IPS\Dispatcher\Controller
 		if ( !$type )
 		{
 			Output::i()->error( 'node_error', '2FAVI203/1' );
-
 			return;
 		}
 
@@ -77,13 +76,11 @@ class _router extends \IPS\Dispatcher\Controller
 				if ( isset( $urls['favicon.ico'] ) )
 				{
 					Output::i()->redirect( Url::external( $urls['favicon.ico'] ) );
-
 					return;
 				}
 				else
 				{
 					Output::i()->error( 'node_error', '2FAVI203/2' );
-
 					return;
 				}
 			}
@@ -91,13 +88,11 @@ class _router extends \IPS\Dispatcher\Controller
 			if ( isset( $urls["favicon-{$width}x{$height}.png"] ) )
 			{
 				Output::i()->redirect( Url::external( $urls["favicon-{$width}x{$height}.png"] ) );
-
 				return;
 			}
 			else
 			{
 				Output::i()->error( 'node_error', '2FAVI203/3' );
-
 				return;
 			}
 		}
@@ -116,31 +111,23 @@ class _router extends \IPS\Dispatcher\Controller
 					return;*/
 
 					Output::i()->redirect( Url::external( $urls['apple-touch-icon.png'] ) );
-
 					return;
 				}
 				else
 				{
 					Output::i()->error( 'node_error', '2FAVI203/4' );
-
 					return;
 				}
 			}
 
 			if ( isset( $urls["apple-touch-icon-{$width}x{$height}.png"] ) )
 			{
-				/*$favicon = Favicon::loadByName( "apple-touch-icon-{$width}x{$height}.png" );
-				Output::i()->sendOutput( $favicon->file->contents(), 200, 'image/png' );
-				return;*/
-
 				Output::i()->redirect( Url::external( $urls["apple-touch-icon-{$width}x{$height}.png"] ) );
-
 				return;
 			}
 			else
 			{
 				Output::i()->error( 'node_error', '2FAVI203/5' );
-
 				return;
 			}
 		}
@@ -149,18 +136,12 @@ class _router extends \IPS\Dispatcher\Controller
 		{
 			if ( isset( $urls["apple-touch-icon-precomposed.png"] ) )
 			{
-				/*$favicon = Favicon::loadByName( 'apple-touch-icon-precomposed.png' );
-				Output::i()->sendOutput( $favicon->file->contents(), 200, 'image/png' );
-				return;*/
-
 				Output::i()->redirect( Url::external( $urls["apple-touch-icon-precomposed.png"] ) );
-
 				return;
 			}
 			else
 			{
 				Output::i()->error( 'node_error', '2FAVI203/6' );
-
 				return;
 			}
 		}
@@ -173,13 +154,11 @@ class _router extends \IPS\Dispatcher\Controller
 			if ( isset( $urls["android-chrome-{$width}x{$height}.png"] ) )
 			{
 				Output::i()->redirect( Url::external( $urls["android-chrome-{$width}x{$height}.png"] ) );
-
 				return;
 			}
 			else
 			{
 				Output::i()->error( 'node_error', '2FAVI203/7' );
-
 				return;
 			}
 		}
@@ -192,17 +171,14 @@ class _router extends \IPS\Dispatcher\Controller
 			if ( isset( $urls["mstile-{$width}x{$height}.png"] ) )
 			{
 				Output::i()->redirect( Url::external( $urls["mstile-{$width}x{$height}.png"] ) );
-
 				return;
 			}
 			else
 			{
 				Output::i()->error( 'node_error', '2FAVI203/8' );
-
 				return;
 			}
 		}
-
 
 		Output::i()->error( 'node_error', '2FAVI203/9' );
 	}
