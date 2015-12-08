@@ -380,6 +380,143 @@ class _Favicon extends \IPS\Patterns\ActiveRecord
 	}
 
 	/**
+	 * Generate the master favicon.ico file
+	 *
+	 * @param   \IPS\Image  $image
+	 */
+	protected function generateMasterFavicon( $image )
+	{
+		$maxSize = max( $image->width, $image->height );
+		$image->resizeToMax( $maxSize, $maxSize );
+		$image->crop( 48, 48 );
+
+		$ico = new \PHP_ICO\PHP_ICO();
+		$ico->PHP_ICO();
+		$ico->add_image( (string) $image, [ [ 48, 48 ], [ 32, 32 ], [ 16, 16 ] ] );
+
+		$file = File::create( 'favicons_Favicons', 'favicon.ico', $ico->get_ico(), 'favicons', FALSE, NULL, FALSE );
+
+		/* Save the new favicon record */
+		$record = new Favicon();
+
+		$record->type = Favicon::MASTER;
+		$record->name = $file->filename;
+		$record->file = $file;
+
+		$record->save();
+	}
+
+	/**
+	 * Generate the base Apple touch icons
+	 *
+	 * @param   \IPS\Image  $favicon
+	 */
+	protected function generateIosIcons( $favicon )
+	{
+		$maxSize = max( $favicon->width, $favicon->height );
+		$favicon->resizeToMax( $maxSize, $maxSize );
+		$favicon->crop( 180, 180 );
+
+		foreach ( [ 'apple-touch-icon.%s', 'apple-touch-icon-precomposed.%s' ] as $filenameTemplate )
+		{
+			$filename = sprintf( $filenameTemplate, 'png' );
+			$file = File::create(
+					'favicons_Favicons', $filename, (string) $favicon, 'favicons', FALSE, NULL, FALSE
+			);
+
+			/* Save the new favicon record */
+			$record = new Favicon();
+
+			$record->type = Favicon::IOS;
+			$record->name = $file->filename;
+			$record->file = $file;
+
+			$record->save();
+		}
+	}
+
+	/**
+	 * Generate the dynamically sized Windows icons
+	 *
+	 * @param   \IPS\Image  $favicon
+	 */
+	protected function generateWindowsIcons( $favicon )
+	{
+		$sizes = [
+				[
+						'name'   => 'mstile-150x150.png',
+						'canvas' => [ 'w' => '270', 'h' => 270 ],
+						'size'   => [ 'w' => '135', 'h' => 135 ],
+						'offset' => [ 'x' => '-67', 'y' => '-45' ],
+						'public' => [ 'w' => '150', 'h' => '150' ]
+				],
+				[
+						'name'   => 'mstile-310x150.png',
+						'canvas' => [ 'w' => '558', 'h' => 270 ],
+						'size'   => [ 'w' => '126', 'h' => 126 ],
+						'offset' => [ 'x' => '-216', 'y' => '-50' ],
+						'public' => [ 'w' => '310', 'h' => '150' ]
+				],
+				[
+						'name'   => 'mstile-310x310.png',
+						'canvas' => [ 'w' => '558', 'h' => 558 ],
+						'size'   => [ 'w' => '259', 'h' => 259 ],
+						'offset' => [ 'x' => '-149', 'y' => '-128' ],
+						'public' => [ 'w' => '310', 'h' => '310' ]
+				],
+				[
+						'name'   => 'mstile-70x70.png',
+						'canvas' => [ 'w' => '128', 'h' => 128 ],
+						'size'   => [ 'w' => '95', 'h' => 95 ],
+						'offset' => [ 'x' => '-16', 'y' => '-16' ],
+						'public' => [ 'w' => '70', 'h' => '70' ]
+				]
+		];
+
+		foreach ( $sizes as $size )
+		{
+			// Create the image
+			$maxSize = max( $favicon->width, $favicon->height );
+			$favicon->resizeToMax( $maxSize, $maxSize );
+			$favicon->crop( $size['size']['w'], $size['size']['h'] );
+
+			$canvas = imagecreatetruecolor( $size['canvas']['w'], $size['canvas']['h'] );
+
+			imagealphablending( $canvas, FALSE );
+			imagesavealpha( $canvas, TRUE );
+
+			$trans_colour = imagecolorallocatealpha( $canvas, 0, 0, 0, 127 );
+			imagefill( $canvas, 0, 0, $trans_colour );
+
+			// Place our image on the canvas
+			imagecopy(
+					$canvas, imagecreatefromstring( (string) $favicon ), abs( $size['offset']['x'] ),
+					abs( $size['offset']['y'] ), 0, 0, $favicon->width, $favicon->height
+			);
+
+			// Render the output image
+			ob_start();
+			imagepng( $canvas );
+			$result = ob_get_clean();
+			imagedestroy( $canvas );
+
+			// Save the result
+			$file = File::create( 'favicons_Favicons', $size['name'], $result, 'favicons', FALSE, NULL, FALSE );
+
+			/* Save the new favicon record */
+			$record = new Favicon();
+
+			$record->type = Favicon::WINDOWS;
+			$record->name = $file->filename;
+			$record->file = $file;
+			$record->width = $size['public']['w'];
+			$record->height = $size['public']['h'];
+
+			$record->save();
+		}
+	}
+
+	/**
 	 * Generate icons for the specified device type
 	 *
 	 * @param   int $for The device type to generate icons for
@@ -410,24 +547,9 @@ class _Favicon extends \IPS\Patterns\ActiveRecord
 				throw new \UnexpectedValueException( 'Unrecognized icon type' );
 		}
 
-		$sizes = "{$type}Sizes";
+		$master       = static::baseImage();
 		$nameTemplate = "{$type}NameTemplate";
-
-		/* Can we support our master images filetype? */
-		$master = static::baseImage();
-		switch ( File::getMimeType( (string) $master ) )
-		{
-			case 'image/x-icon':
-			case 'image/gif':
-			case 'image/png':
-				$ext = 'png';
-				break;
-
-			default:
-				$ext =
-						'jpeg';
-				break;
-		}
+		$sizes        = "{$type}Sizes";
 
 		/* Generate the favicons */
 		foreach ( static::$$sizes as $size )
@@ -436,12 +558,12 @@ class _Favicon extends \IPS\Patterns\ActiveRecord
 
 			$favicon = \IPS\Image::create( $master->contents() );
 			$maxSize = max( $favicon->width, $favicon->height );
+
 			// TODO: We should handle this better, this can result in broken transparency
 			$favicon->resizeToMax( $maxSize, $maxSize );
 			$favicon->crop( $width, $height );
 
-			$filename = sprintf( static::$$nameTemplate, $width, $height, $ext );
-
+			$filename = sprintf( static::$$nameTemplate, $width, $height, 'png' );
 			$file = File::create( 'favicons_Favicons', $filename, (string) $favicon, 'favicons', FALSE, NULL, FALSE );
 
 			/* Save the new favicon record */
@@ -454,132 +576,20 @@ class _Favicon extends \IPS\Patterns\ActiveRecord
 			$record->save();
 		}
 
-		/* Standard specific patch-in */
+		/* Master specific patch-ins */
 		if ( $for === static::MASTER )
 		{
-			$image = \IPS\Image::create( $master->contents() );
-			$maxSize = max( $image->width, $image->height );
-			$image->resizeToMax( $maxSize, $maxSize );
-			$image->crop( 48, 48 );
-
-			$ico = new \PHP_ICO\PHP_ICO();
-			$ico->PHP_ICO();
-			$ico->add_image( (string) $image, [ [ 48, 48 ], [ 32, 32 ], [ 16, 16 ] ] );
-
-			$file = File::create( 'favicons_Favicons', 'favicon.ico', $ico->get_ico(), 'favicons', FALSE, NULL, FALSE );
-
-			/* Save the new favicon record */
-			$record = new Favicon();
-
-			$record->type = Favicon::MASTER;
-			$record->name = $file->filename;
-			$record->file = $file;
-
-			$record->save();
+			static::generateMasterFavicon( \IPS\Image::create( $master->contents() ) );
 		}
-
-		/* Apple specific patch-in */
-		if ( $for === static::IOS )
+		/* Apple specific patch-ins */
+		elseif ( $for === static::IOS )
 		{
-			$favicon = \IPS\Image::create( $master->contents() );
-			$maxSize = max( $favicon->width, $favicon->height );
-			$favicon->resizeToMax( $maxSize, $maxSize );
-			$favicon->crop( 180, 180 );
-
-			foreach ( [ 'apple-touch-icon.%s', 'apple-touch-icon-precomposed.%s' ] as $filenameTemplate )
-			{
-				$filename = sprintf( $filenameTemplate, $ext );
-				$file = File::create(
-						'favicons_Favicons', $filename, (string) $favicon, 'favicons', FALSE, NULL, FALSE
-				);
-
-				/* Save the new favicon record */
-				$record = new Favicon();
-
-				$record->type = Favicon::IOS;
-				$record->name = $file->filename;
-				$record->file = $file;
-
-				$record->save();
-			}
+			static::generateIosIcons( \IPS\Image::create( $master->contents() ) );
 		}
-
 		/* Microsoft specific patch-ins */
-		if ( $for === static::WINDOWS )
+		elseif ( $for === static::WINDOWS )
 		{
-			$sizes = [
-					[
-							'name'   => 'mstile-150x150.png',
-							'canvas' => [ 'w' => '270', 'h' => 270 ],
-							'size'   => [ 'w' => '135', 'h' => 135 ],
-							'offset' => [ 'x' => '-67', 'y' => '-45' ],
-							'public' => [ 'w' => '150', 'h' => '150' ]
-					],
-					[
-							'name'   => 'mstile-310x150.png',
-							'canvas' => [ 'w' => '558', 'h' => 270 ],
-							'size'   => [ 'w' => '126', 'h' => 126 ],
-							'offset' => [ 'x' => '-216', 'y' => '-50' ],
-							'public' => [ 'w' => '310', 'h' => '150' ]
-					],
-					[
-							'name'   => 'mstile-310x310.png',
-							'canvas' => [ 'w' => '558', 'h' => 558 ],
-							'size'   => [ 'w' => '259', 'h' => 259 ],
-							'offset' => [ 'x' => '-149', 'y' => '-128' ],
-							'public' => [ 'w' => '310', 'h' => '310' ]
-					],
-					[
-							'name'   => 'mstile-70x70.png',
-							'canvas' => [ 'w' => '128', 'h' => 128 ],
-							'size'   => [ 'w' => '95', 'h' => 95 ],
-							'offset' => [ 'x' => '-16', 'y' => '-16' ],
-							'public' => [ 'w' => '70', 'h' => '70' ]
-					]
-			];
-
-			foreach ( $sizes as $size )
-			{
-				// Create the image
-				$favicon = \IPS\Image::create( $master->contents() );
-				$maxSize = max( $favicon->width, $favicon->height );
-				$favicon->resizeToMax( $maxSize, $maxSize );
-				$favicon->crop( $size['size']['w'], $size['size']['h'] );
-
-				$canvas = imagecreatetruecolor( $size['canvas']['w'], $size['canvas']['h'] );
-
-				imagealphablending( $canvas, FALSE );
-				imagesavealpha( $canvas, TRUE );
-
-				$trans_colour = imagecolorallocatealpha( $canvas, 0, 0, 0, 127 );
-				imagefill( $canvas, 0, 0, $trans_colour );
-
-				// Place our image on the canvas
-				imagecopy(
-						$canvas, imagecreatefromstring( (string) $favicon ), abs( $size['offset']['x'] ),
-						abs( $size['offset']['y'] ), 0, 0, $favicon->width, $favicon->height
-				);
-
-				// Render the output image
-				ob_start();
-				imagepng( $canvas );
-				$result = ob_get_clean();
-				imagedestroy( $canvas );
-
-				// Save the result
-				$file = File::create( 'favicons_Favicons', $size['name'], $result, 'favicons', FALSE, NULL, FALSE );
-
-				/* Save the new favicon record */
-				$record = new Favicon();
-
-				$record->type = Favicon::WINDOWS;
-				$record->name = $file->filename;
-				$record->file = $file;
-				$record->width = $size['public']['w'];
-				$record->height = $size['public']['h'];
-
-				$record->save();
-			}
+			static::generateWindowsIcons( \IPS\Image::create( $master->contents() ) );
 		}
 	}
 
