@@ -42,6 +42,7 @@ checks:
         require_scope_for_properties: true
         require_scope_for_methods: true
         non_commented_empty_catch_block: false
+        no_commented_out_code: false
 
 coding_style:
     php:

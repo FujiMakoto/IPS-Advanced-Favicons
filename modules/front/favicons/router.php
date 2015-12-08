@@ -31,14 +31,53 @@ class _router extends \IPS\Dispatcher\Controller
 	}
 
 	/**
+	 * Find and redirect to our favicon, or throw an error if it does not exist
+	 *
+	 * @param   array       $urls
+	 * @param   string|null $filenameTemplate
+	 * @param   string|null $default
+	 */
+	protected function findOrFail( $urls, $filenameTemplate=NULL, $default=NULL )
+	{
+		$width  = (int) Request::i()->width;
+		$height = (int) Request::i()->height;
+
+		if ( !$width or !$height )
+		{
+			// If we expect a default favicon without any size attributes, try and redirect to it
+			if ( ( $default !== NULL ) and isset( $urls[ $default ] ) )
+			{
+				Output::i()->redirect( Url::external( $urls[ $default ] ) );
+				return;
+			}
+
+			Output::i()->error( 'node_error', '2FAVI203/2' );
+		}
+
+		// Format the filename and redirect to it if it exists
+		if ( $filenameTemplate !== NULL )
+		{
+			$filename = sprintf( $filenameTemplate, $width, $height );
+			if ( isset( $urls[ $filename ] ) )
+			{
+				Output::i()->redirect( Url::external( $urls[ $filename ] ) );
+				return;
+			}
+		}
+
+		// If we're still here, we couldn't find our favicon
+		Output::i()->error( 'node_error', '2FAVI203/3' );
+	}
+
+	/**
 	 * Route favicons requested at the root level
 	 *
 	 * @return    void
 	 */
 	protected function manage()
 	{
-		$width = (int) Request::i()->width;
-		$height = (int) Request::i()->height;
+		$default = NULL;
+		$filenameTemplate = NULL;
 		$type = Request::i()->type;
 
 		if ( !$type )
@@ -66,120 +105,31 @@ class _router extends \IPS\Dispatcher\Controller
 			\IPS\Data\Store::i()->favicons_urls = json_encode( $urls );
 		}
 
-		/**
-		 * Standard
-		 */
-		if ( $type == 'master' )
+		// Get the filename attributes
+		switch ( $type )
 		{
-			if ( !$width or !$height )
-			{
-				if ( isset( $urls['favicon.ico'] ) )
-				{
-					Output::i()->redirect( Url::external( $urls['favicon.ico'] ) );
-					return;
-				}
-				else
-				{
-					Output::i()->error( 'node_error', '2FAVI203/2' );
-					return;
-				}
-			}
+			case 'master':
+				$default = 'favicon.ico';
+				$filenameTemplate = 'favicon-%sx%s.png';
+				break;
 
-			if ( isset( $urls["favicon-{$width}x{$height}.png"] ) )
-			{
-				Output::i()->redirect( Url::external( $urls["favicon-{$width}x{$height}.png"] ) );
-				return;
-			}
-			else
-			{
-				Output::i()->error( 'node_error', '2FAVI203/3' );
-				return;
-			}
+			case 'apple':
+				$default = 'apple-touch-icon.png';
+				$filenameTemplate = 'apple-touch-icon-%sx%s.png';
+				break;
+
+			case 'apple_precomposed':
+				$default = 'apple-touch-icon-precomposed.png';
+				break;
+
+			case 'android':
+				$filenameTemplate = 'android-chrome-%sx%s.png';
+				break;
+
+			case 'microsoft':
+				$filenameTemplate = 'mstile-%sx%s.png';
 		}
 
-		/**
-		 * Apple
-		 */
-		if ( $type == 'apple' )
-		{
-			if ( !$width or !$height )
-			{
-				if ( isset( $urls['apple-touch-icon.png'] ) )
-				{
-					/*$favicon = Favicon::loadByName( 'apple-touch-icon.png' );
-					Output::i()->sendOutput( $favicon->file->contents(), 200, 'image/png' );
-					return;*/
-
-					Output::i()->redirect( Url::external( $urls['apple-touch-icon.png'] ) );
-					return;
-				}
-				else
-				{
-					Output::i()->error( 'node_error', '2FAVI203/4' );
-					return;
-				}
-			}
-
-			if ( isset( $urls["apple-touch-icon-{$width}x{$height}.png"] ) )
-			{
-				Output::i()->redirect( Url::external( $urls["apple-touch-icon-{$width}x{$height}.png"] ) );
-				return;
-			}
-			else
-			{
-				Output::i()->error( 'node_error', '2FAVI203/5' );
-				return;
-			}
-		}
-
-		if ( $type == 'apple_precomposed' )
-		{
-			if ( isset( $urls['apple-touch-icon-precomposed.png'] ) )
-			{
-				Output::i()->redirect( Url::external( $urls['apple-touch-icon-precomposed.png'] ) );
-				return;
-			}
-			else
-			{
-				Output::i()->error( 'node_error', '2FAVI203/6' );
-				return;
-			}
-		}
-
-		/**
-		 * Android
-		 */
-		if ( $type == 'android' )
-		{
-			if ( isset( $urls["android-chrome-{$width}x{$height}.png"] ) )
-			{
-				Output::i()->redirect( Url::external( $urls["android-chrome-{$width}x{$height}.png"] ) );
-				return;
-			}
-			else
-			{
-				Output::i()->error( 'node_error', '2FAVI203/7' );
-				return;
-			}
-		}
-
-		/**
-		 * Windows
-		 */
-		if ( $type == 'microsoft' )
-		{
-			if ( isset( $urls["mstile-{$width}x{$height}.png"] ) )
-			{
-				Output::i()->redirect( Url::external( $urls["mstile-{$width}x{$height}.png"] ) );
-				return;
-			}
-			else
-			{
-				Output::i()->error( 'node_error', '2FAVI203/8' );
-				return;
-			}
-		}
-
-		Output::i()->error( 'node_error', '2FAVI203/9' );
+		$this->findOrFail( $urls, $filenameTemplate, $default );
 	}
 }
