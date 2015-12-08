@@ -21,7 +21,7 @@ class _Application extends \IPS\Application
 	 *
 	 * @return  string
 	 */
-	function get__icon()
+	public function get__icon()
 	{
 		/* "file" is meant to represent the generic page icon displayed when a website doesn't have a favicon */
 		return 'file';
