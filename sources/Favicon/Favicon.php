@@ -652,9 +652,9 @@ class _Favicon extends \IPS\Patterns\ActiveRecord
 	 */
 	public static function androidManifestHtml()
 	{
-		$s = Settings::i();
+		$settings = Settings::i();
 
-		if ( $url = $s->favicons_androidManifest )
+		if ( $url = $settings->favicons_androidManifest )
 		{
 			try
 			{
@@ -662,17 +662,17 @@ class _Favicon extends \IPS\Patterns\ActiveRecord
 				$url = (string) $file->url;
 				$html = "<link rel='manifest' href='{$url}'>";
 
-				if ( $themeColor = $s->favicons_androidColor )
+				if ( $themeColor = $settings->favicons_androidColor )
 				{
 					$html = $html . "<meta name='theme-color' content='{$themeColor}'>";
 				}
 
 				return $html;
 			}
-			catch ( \Exception $e )
+			catch ( \Exception $exc )
 			{
 				\IPS\Log::i( \LOG_DEBUG )->write(
-						'Favicons Error : ' . $e->getMessage() . "\n" . $e->getTraceAsString(), 'favicons_error'
+						'Favicons Error : ' . $exc->getMessage() . "\n" . $exc->getTraceAsString(), 'favicons_error'
 				);
 			}
 		}
