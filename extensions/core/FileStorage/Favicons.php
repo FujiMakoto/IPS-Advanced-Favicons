@@ -1,13 +1,13 @@
 <?php
 /**
- * @brief		File Storage Extension: Favicons
- * @author		<a href='http://www.invisionpower.com'>Invision Power Services, Inc.</a>
- * @copyright	(c) 2001 - SVN_YYYY Invision Power Services, Inc.
- * @license		http://www.invisionpower.com/legal/standards/
- * @package		IPS Social Suite
- * @subpackage	Advanced Favicons
- * @since		15 Nov 2015
- * @version		SVN_VERSION_NUMBER
+ * @brief            File Storage Extension: Favicons
+ * @author           <a href='http://www.invisionpower.com'>Invision Power Services, Inc.</a>
+ * @copyright    (c) 2001 - SVN_YYYY Invision Power Services, Inc.
+ * @license          http://www.invisionpower.com/legal/standards/
+ * @package          IPS Social Suite
+ * @subpackage       Advanced Favicons
+ * @since            15 Nov 2015
+ * @version          SVN_VERSION_NUMBER
  */
 
 namespace IPS\favicons\extensions\core\FileStorage;
@@ -29,13 +29,13 @@ class _Favicons
 	/**
 	 * Count stored files
 	 *
-	 * @return	int
+	 * @return    int
 	 */
 	public function count()
 	{
 		return Favicon::favicons()->count( TRUE );
 	}
-	
+
 	/**
 	 * Move stored files
 	 *
@@ -45,7 +45,7 @@ class _Favicons
 	 * @throws	\UnderflowException					When file record doesn't exist. Indicating there are no more files to move
 	 * @return	void|int							An offset integer to use on the next cycle, or nothing
 	 */
-	public function move( $offset, $storageConfiguration, $oldConfiguration=NULL )
+	public function move( $offset, $storageConfiguration, $oldConfiguration = NULL )
 	{
 		$favicons = Favicon::favicons();
 
@@ -53,7 +53,9 @@ class _Favicons
 		{
 			if ( $oldConfiguration )
 			{
-				\IPS\File::get( $oldConfiguration ?: 'favicons_Favicons', (string) $favicon->file )->move( $storageConfiguration );
+				\IPS\File::get( $oldConfiguration ?: 'favicons_Favicons', (string) $favicon->file )->move(
+					$storageConfiguration
+				);
 			}
 			else
 			{
@@ -65,8 +67,8 @@ class _Favicons
 	/**
 	 * Check if a file is valid
 	 *
-	 * @param	\IPS\Http\Url	$file		The file to check
-	 * @return	bool
+	 * @param    \IPS\Http\Url $file The file to check
+	 * @return    bool
 	 */
 	public function isValidFile( $file )
 	{
@@ -85,7 +87,7 @@ class _Favicons
 	/**
 	 * Delete all stored files
 	 *
-	 * @return	void
+	 * @return    void
 	 */
 	public function delete()
 	{

@@ -1,6 +1,7 @@
 filter:
     excluded_paths:
         - 'data/*'
+        - 'dev/*'
         - 'interface/*'
         - 'setup/*'
         - 'sources/3rd_party/*'
@@ -40,6 +41,7 @@ checks:
         avoid_unnecessary_concatenation: true
         require_scope_for_properties: true
         require_scope_for_methods: true
+        non_commented_empty_catch_block: false
 
 coding_style:
     php:
@@ -59,6 +61,8 @@ coding_style:
                 while: true
                 switch: true
                 catch: true
+                brackets: true
+                array_initializer: true
         braces:
             classes_functions:
                 class: new-line
