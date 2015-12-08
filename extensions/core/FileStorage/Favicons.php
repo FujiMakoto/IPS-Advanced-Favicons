@@ -51,7 +51,7 @@ class _Favicons
 
 		foreach ( $favicons as $favicon )
 		{
-			if ( $oldConfiguration )
+			if ( $oldConfiguration !== NULL )
 			{
 				\IPS\File::get( $oldConfiguration ?: 'favicons_Favicons', (string) $favicon->file )->move(
 					$storageConfiguration

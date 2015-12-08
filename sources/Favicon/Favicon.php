@@ -419,7 +419,7 @@ class _Favicon extends \IPS\Patterns\ActiveRecord
 
 		foreach ( [ 'apple-touch-icon.%s', 'apple-touch-icon-precomposed.%s' ] as $filenameTemplate )
 		{
-			$filename = sprintf( $filenameTemplate, $ext );
+			$filename = sprintf( $filenameTemplate, 'png' );
 			$file = File::create(
 					'favicons_Favicons', $filename, (string) $favicon, 'favicons', FALSE, NULL, FALSE
 			);
