@@ -134,9 +134,9 @@ class _router extends \IPS\Dispatcher\Controller
 
 		if ( $type == 'apple_precomposed' )
 		{
-			if ( isset( $urls["apple-touch-icon-precomposed.png"] ) )
+			if ( isset( $urls['apple-touch-icon-precomposed.png'] ) )
 			{
-				Output::i()->redirect( Url::external( $urls["apple-touch-icon-precomposed.png"] ) );
+				Output::i()->redirect( Url::external( $urls['apple-touch-icon-precomposed.png'] ) );
 				return;
 			}
 			else
