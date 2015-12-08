@@ -59,6 +59,8 @@ coding_style:
                 while: true
                 switch: true
                 catch: true
+                brackets: true
+                array_initializer: true
         braces:
             classes_functions:
                 class: new-line
