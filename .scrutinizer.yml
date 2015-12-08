@@ -1,6 +1,7 @@
 filter:
     excluded_paths:
         - 'data/*'
+        - 'dev/*'
         - 'interface/*'
         - 'setup/*'
         - 'sources/3rd_party/*'
