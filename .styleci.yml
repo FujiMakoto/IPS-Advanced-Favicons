@@ -1,3 +1,5 @@
+preset: none
+
 linting: true
 
 enabled:
