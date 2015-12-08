@@ -13,7 +13,6 @@ enabled:
   - duplicate_semicolon
   - function_call_space
   - function_declaration
-  - function_declaration
   - linefeed
   - method_argument_space
   - newline_after_open_tag
