@@ -1,5 +1,7 @@
 # Advanced Favicons
 
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/FujiMakoto/IPS-Advanced-Favicons/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/FujiMakoto/IPS-Advanced-Favicons/?branch=master)
+
 ## Introduction
 Advanced Favicons is a third party IPS application that handles the tedious and deceptively complex task of generating favicons for your IPS community website.
 
