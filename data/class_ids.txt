@@ -4,6 +4,12 @@ NAMESPACE: IPS\favicons
 ID: 101
 PATH: Favicon/Favicon.php
 
+TYPE: Sources
+CLASSNAME: DevFiles
+NAMESPACE: IPS\favicons
+ID: 102
+PATH: DevFiles/DevFiles.php
+
 TYPE: Modules
 CLASSNAME: manage
 NAMESPACE: IPS\favicons\modules\admin\favicons
@@ -27,4 +33,16 @@ CLASSNAME: Favicons
 NAMESPACE: IPS\favicons\extensions\core\FileStorage
 ID: 301
 PATH: core/FileStorage/Favicons.php
+
+TYPE: Extensions
+CLASSNAME: DevFiles
+NAMESPACE: IPS\favicons\extensions\core\Build
+ID: 302
+PATH: core/Build/DevFiles.php
+
+TYPE: Setup
+CLASSNAME: does
+NAMESPACE: IPS\favicons\setup\upg_100001
+ID: 801
+PATH: upg_100001/upgrade.php
 

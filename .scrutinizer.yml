@@ -32,9 +32,10 @@ checks:
         line_length:
             max_length: '120'
         encourage_single_quotes: true
-        classes_in_camel_caps: true
+        classes_in_camel_caps: false  # Can't be checked since classes must start with an underscore for monkey-patching
         avoid_fixme_comments: true
         verify_property_names: false
+        avoid_unnecessary_concatenation: false
 
 coding_style:
     php:
