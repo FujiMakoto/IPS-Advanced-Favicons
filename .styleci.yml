@@ -1,0 +1,32 @@
+linting: true
+
+enabled:
+  - align_double_arrow
+  - align_equals
+  - array_element_no_space_before_comma
+  - array_element_white_space_after_comma
+  - blankline_after_open_tag
+  - braces
+  - concat_with_spaces
+  - duplicate_semicolon
+  - function_call_space
+  - function_declaration
+  - linefeed
+  - method_argument_space
+  - newline_after_open_tag
+  - phpdoc_align
+  - phpdoc_indent
+  - phpdoc_no_package
+  - phpdoc_no_access
+  - phpdoc_scalar
+  - php_closing_tag
+  - single_quote
+  - visibility
+
+finder:
+  name:
+    - "*.php"
+  not-path:
+    - "dev"
+    - "setup"
+    - "interface"
