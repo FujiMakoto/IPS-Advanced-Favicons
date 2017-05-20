@@ -245,7 +245,7 @@ class _manage extends \IPS\Dispatcher\Controller
 		$default = ( !empty( $data['favicons_master'] ) ) ? $data['favicons_master'] : NULL;
 		$form->add(
 				new Form\Upload(
-						'favicons_master', $default, TRUE, [
+						'favicons_master', $default, FALSE, [
 								'storageExtension' => 'favicons_Favicons',
 								'image'            => TRUE,
 								'obscure'          => FALSE
@@ -313,7 +313,7 @@ class _manage extends \IPS\Dispatcher\Controller
 		$form->class = 'ipsForm_noLabels';
 		$form->add(
 				new \IPS\Helpers\Form\Custom(
-						'photo_crop', [ 0, 0, $suggestedWidth, $suggestedHeight ], FALSE, [
+						'photo_crop', [ 0, 0, $suggestedWidth, $suggestedHeight ], TRUE, [
 						'getHtml' => function ( $field ) use ( $image, $stepUrl )
 						{
 							return \IPS\Theme::i()->getTemplate( 'wizard' )->photoCrop(

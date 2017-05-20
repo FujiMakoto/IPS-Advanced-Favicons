@@ -384,7 +384,7 @@ class _Favicon extends \IPS\Patterns\ActiveRecord
 	 *
 	 * @param   \IPS\Image  $image
 	 */
-	protected function generateMasterFavicon( $image )
+	protected static function generateMasterFavicon( $image )
 	{
 		$maxSize = max( $image->width, $image->height );
 		$image->resizeToMax( $maxSize, $maxSize );
@@ -411,7 +411,7 @@ class _Favicon extends \IPS\Patterns\ActiveRecord
 	 *
 	 * @param   \IPS\Image  $favicon
 	 */
-	protected function generateIosIcons( $favicon )
+	protected static function generateIosIcons( $favicon )
 	{
 		$maxSize = max( $favicon->width, $favicon->height );
 		$favicon->resizeToMax( $maxSize, $maxSize );
@@ -440,7 +440,7 @@ class _Favicon extends \IPS\Patterns\ActiveRecord
 	 *
 	 * @param   \IPS\Image  $favicon
 	 */
-	protected function generateWindowsIcons( $favicon )
+	protected static function generateWindowsIcons( $favicon )
 	{
 		$sizes = [
 				[
