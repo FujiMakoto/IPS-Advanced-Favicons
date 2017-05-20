@@ -1,9 +1,5 @@
 # Advanced Favicons
 
-[![Version](https://img.shields.io/badge/version-1.0.1-blue.svg)](https://www.makoto.io/files/file/15-advanced-favicons/)
-[![License](https://img.shields.io/badge/license-MIT%20License-blue.svg)](https://github.com/FujiMakoto/IPS-Advanced-Favicons/blob/master/LICENSE)
-[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/FujiMakoto/IPS-Advanced-Favicons/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/FujiMakoto/IPS-Advanced-Favicons/?branch=master)
-
 ## Introduction
 Advanced Favicons is a third party IPS application that handles the tedious and deceptively complex task of generating favicons for your IPS community website.
 
@@ -16,14 +12,6 @@ You *really* don't want to have to create all of these images and files yourself
 I hope not. Advanced Favicons to the rescue then!
 
 This application will handle the mundane and complex task of generating all of these files for you in an easy, step by step process. All you need to do is upload a single, high quality logo image that you wish to use as your favicons base image, answer a few basic questions about how you'd like your site to be displayed on mobile devices, and you're done!
-
-## Demonstration
-
-You can see a quick "before" and after demonstration of the application here (you can replace community.invisionpower.com with your own forum as well),
-
-**Before**: http://realfavicongenerator.net/favicon_checker?site=community.invisionpower.com
-
-**After**: http://realfavicongenerator.net/favicon_checker?site=https%3A%2F%2Fwww.makoto.io
 
 ## Setup and configuration
 First, install the application in your AdminCP by uploading the included .tar file in the Applications page, located under the System tab.
