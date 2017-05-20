@@ -2,6 +2,7 @@
 
 $lang = array(
 	'__app_favicons'	=> "Advanced Favicons",
+	'module__favicons_favicons' => 'Advanced Favicons',
 
 	'menu__favicons_favicons'   => 'Favicons',
 
